@@ -22,7 +22,6 @@ ipch/
 *.opensdf
 *.sdf
 *.cachefile
-motel/.vs/motel/v17/*
 
 # Visual Studio profiler
 *.psess
