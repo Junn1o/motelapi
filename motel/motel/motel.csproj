@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\DTO\" />
+    <Folder Include="Controllers\" />
     <Folder Include="Repositories\" />
   </ItemGroup>
 
