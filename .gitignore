@@ -37,3 +37,14 @@ _ReSharper*/
 
 # TeamCity is a build add-in
 _TeamCity*
+/.vs/motelapi/v17/.wsuo
+/motel/.vs/motel/FileContentIndex/9045f0ba-3555-429b-92f2-7860123cef30.vsidx
+/motel/.vs/motel/FileContentIndex/a1904518-3058-4690-9b85-736ebe282110.vsidx
+/motel/.vs/motel/FileContentIndex/d7bd8cfa-da53-40bf-a584-64e7b6610384.vsidx
+/motel/.vs/motel/FileContentIndex/f50b28cc-8790-43e0-81f3-dd9ef59c3eb2.vsidx
+/motel/.vs/motel/FileContentIndex/fbbf7116-1868-4a87-a678-3bab6c52d989.vsidx
+*.vsidx
+/motel/motel/obj/Debug/net7.0/motel.assets.cache
+/motel/motel/obj/Debug/net7.0/motel.GeneratedMSBuildEditorConfig.editorconfig
+/motel/motel/obj/motel.csproj.nuget.dgspec.json
+/motel/motel/obj/project.nuget.cache
