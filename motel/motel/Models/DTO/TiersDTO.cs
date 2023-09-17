@@ -2,7 +2,17 @@
 {
     public class TiersDTO
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
+        public string tiername { get; set; }
+        public List<string> Users { get; set; }
+    }
+    public class TiersNoIdDTO
+    {
+        public string tiername { get; set; }
+        public List<string>? Users { get; set; }
+    }
+    public class AddTiersDTO
+    {
         public string tiername { get; set; }
     }
 }

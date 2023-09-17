@@ -22,7 +22,8 @@ ipch/
 *.opensdf
 *.sdf
 *.cachefile
-
+.vs
+motel/.vs
 # Visual Studio profiler
 *.psess
 *.vsp
