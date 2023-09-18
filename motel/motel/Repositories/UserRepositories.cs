@@ -19,16 +19,14 @@ namespace motel.Repositories
         {
             if (addUser.FileUri != null)
             {
-                addUser.birthday = DateTime.ParseExact(addUser.FormattedBirthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                addUser.datecreated = DateTime.Now;
                 var userDomain = new User
                 {
                     firstname = addUser.firstname,
                     lastname = addUser.lastname,
                     address = addUser.address,
                     gender = addUser.gender,
-                    datecreated = addUser.datecreated,
-                    birthday = addUser.birthday,
+                    datecreated = addUser.datecreated = DateTime.Now,
+                    birthday = addUser.birthday = DateTime.ParseExact(addUser.FormattedBirthday, "dd/MM/yyyy", CultureInfo.InvariantCulture),
                     password = addUser.password,
                     phone = addUser.phone,
                     roleId = addUser.roleId,
@@ -108,7 +106,6 @@ namespace motel.Repositories
             var userDomain = _dbContext.User.FirstOrDefault(u => u.Id == id);
             if (userDomain != null)
             {
-                user.birthday = DateTime.ParseExact(user.FormattedBirthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 if (UpdateImage(user.FileUri, userDomain.actualFile, id, userDomain.datecreated.ToString("yyyy")) == null)
                 {
                     user.actualFile = UploadImage(user.FileUri, id, userDomain.datecreated.ToString("yyyy"));
@@ -125,7 +122,7 @@ namespace motel.Repositories
                 userDomain.phone = user.phone;
                 userDomain.tierId = user.tierId;
                 userDomain.roleId = user.roleId;
-                userDomain.birthday = user.birthday;
+                userDomain.birthday = user.birthday = DateTime.ParseExact(user.FormattedBirthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 userDomain.actualFile = user.actualFile;
                 _dbContext.SaveChanges();
             }
