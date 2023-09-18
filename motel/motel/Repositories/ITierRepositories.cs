@@ -8,7 +8,7 @@ namespace motel.Repositories
         List<TiersDTO> GetlAllTier();
         TiersNoIdDTO GetTierById(int id);
         AddTiersDTO AddTier(AddTiersDTO addTiersDTO);
-        TiersNoIdDTO UpdateTierById(int id, TiersNoIdDTO tiersNoIdDTO);
+        AddTiersDTO UpdateTierById(int id, AddTiersDTO tiersNoIdDTO);
         Tiers? DeleteTierById(int id);
 
     }

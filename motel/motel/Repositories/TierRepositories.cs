@@ -18,7 +18,6 @@ namespace motel.Repositories
             {
                 tiername = addTiersDTO.tiername,
             };
-            //Use Domain Model to create Author
             _dbContext.Tiers.Add(TierDomainModel);
             _dbContext.SaveChanges();
             return addTiersDTO;
@@ -57,7 +56,7 @@ namespace motel.Repositories
             return TierWithIdDTO;
         }
 
-        TiersNoIdDTO ITierRepositories.UpdateTierById(int id, TiersNoIdDTO tiersNoIdDTO)
+        AddTiersDTO ITierRepositories.UpdateTierById(int id, AddTiersDTO tiersNoIdDTO)
         {
             var TierDomain = _dbContext.Tiers.FirstOrDefault(n => n.Id == id);
             if (TierDomain != null)

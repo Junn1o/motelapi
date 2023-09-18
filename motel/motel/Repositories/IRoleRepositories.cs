@@ -8,7 +8,7 @@ namespace motel.Repositories
         List<RoleDTO> GetlAllRole();
         RolesNoIdDTO GetRoleById(int id);
         AddRoleDTO AddRole(AddRoleDTO addRoleDTO);
-        RolesNoIdDTO UpdateRoleById(int id, RolesNoIdDTO RoleNoIdDTO);
+        AddRoleDTO UpdateRoleById(int id, AddRoleDTO RoleNoIdDTO);
         Role? DeleteRoleById(int id);
     }
 }

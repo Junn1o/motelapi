@@ -17,7 +17,6 @@ namespace motel.Repositories
             {
                 rolename = addRoleDTO.rolename,
             };
-            //Use Domain Model to create Author
             _dbContext.Role.Add(RoleDomainModel);
             _dbContext.SaveChanges();
             return addRoleDTO;
@@ -56,7 +55,7 @@ namespace motel.Repositories
             return RoleWithIdDTO;
         }
 
-        public RolesNoIdDTO UpdateRoleById(int id, RolesNoIdDTO RoleNoIdDTO)
+        public AddRoleDTO UpdateRoleById(int id, AddRoleDTO RoleNoIdDTO)
         {
             var RoleDomain = _dbContext.Role.FirstOrDefault(n => n.Id == id);
             if (RoleDomain != null)
