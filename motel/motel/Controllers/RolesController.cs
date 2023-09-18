@@ -37,7 +37,7 @@ namespace motel.Controllers
             return Ok();
         }
         [HttpPut("update-role-id")]
-        public IActionResult UpdateRoleById(int id, [FromForm] RolesNoIdDTO
+        public IActionResult UpdateRoleById(int id, [FromForm] AddRoleDTO
        RoleDTO)
         {
             var roleUpdate = _roleRepository.UpdateRoleById(id, RoleDTO);

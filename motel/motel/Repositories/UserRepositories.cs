@@ -32,7 +32,7 @@ namespace motel.Repositories
                     password = addUser.password,
                     phone = addUser.phone,
                     roleId = addUser.roleId,
-                    tierId = addUser.tierId,
+                    tierId = addUser.tierId = 1,
                     FileUri = addUser.FileUri,
                 };
                 addUser.actualFile = UploadImage(addUser.FileUri, userDomain.Id, addUser.datecreated.ToString("yyyy"));
@@ -75,8 +75,8 @@ namespace motel.Repositories
                 phone = User.phone,
                 tier = User.tiers.tiername,
                 rolename = User.role.rolename,
-                FormattedBirthday = User.birthday.ToString("dd/MM/yyyy"),
-                FormattedDatecreated = User.datecreated.ToString("dd/MM/yyyy"),
+                birthday = User.birthday.ToString("dd/MM/yyyy"),
+                datecreated = User.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = User.actualFile,
             }).ToList();
             return allUsers;
@@ -96,8 +96,8 @@ namespace motel.Repositories
                 phone = User.phone,
                 tier = User.tiers.tiername,
                 rolename = User.role.rolename,
-                FormattedBirthday = User.birthday.ToString("dd/MM/yyyy"),
-                FormattedDatecreated = User.datecreated.ToString("dd/MM/yyyy"),
+                birthday = User.birthday.ToString("dd/MM/yyyy"),
+                datecreated = User.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = User.actualFile,
             }).FirstOrDefault();
             return UserWithIdDTO;

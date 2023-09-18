@@ -33,15 +33,14 @@ tierRepository)
             return Ok(tierWithId);
         }
         [HttpPost("add-tier")]
-        public IActionResult AddAuthors([FromForm] AddTiersDTO
+        public IActionResult AddAuthors([FromBody] AddTiersDTO
        addTierDTO)
         {
             var tierAdd = _tierRepository.AddTier(addTierDTO);
             return Ok();
         }
         [HttpPut("update-tier-id")]
-        public IActionResult UpdateBookById(int id, [FromForm] TiersNoIdDTO
-       TierDTO)
+        public IActionResult UpdateBookById(int id, [FromBody] AddTiersDTO TierDTO)
         {
             var tierUpdate = _tierRepository.UpdateTierById(id, TierDTO);
             return Ok(tierUpdate);
