@@ -52,7 +52,7 @@ namespace motel.Models.DTO
         public DateTime datecreated { get; set; }
         public bool gender { get; set; }
         [NotMapped]
-        public IFormFile? FileUri { set; get; }
-        public string? actualFile { get; set; }
+        public IFormFile FileUri { set; get; }
+        public string actualFile { get; set; }
     }
 }
