@@ -24,7 +24,6 @@ ipch/
 *.cachefile
 .vs
 motel/.vs
-
 # Visual Studio profiler
 *.psess
 *.vsp
