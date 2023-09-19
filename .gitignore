@@ -29,7 +29,7 @@ ipch/
 *.cachefile
 .vs
 motel/.vs
-
+motel/motel/obj/
 # Visual Studio profiler
 *.psess
 *.vsp
