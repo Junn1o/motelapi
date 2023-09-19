@@ -21,7 +21,7 @@ namespace motel.Repositories
                 authorname = p.user.firstname + " " + p.user.lastname,
                 description = p.description,
                 price = p.price,
-                actualFile = p.actualFile,
+                actualFile = GetImageFromString(p.actualFile),
                 area = p.area,
                 isHire = p.isHire,
                 status = p.status,
@@ -142,6 +142,60 @@ namespace motel.Repositories
                         _appDbContext.Post_Category.Add(post_category);
                         _appDbContext.SaveChanges();
                     }
+                }
+                return updatepost;
+            }
+            else
+                return null;
+        }
+        public UpdatePost_Manage UpdatePostManage(int id, UpdatePost_Manage updatepost)
+        {
+            var postDomain = _appDbContext.Post.FirstOrDefault(r => r.Id == id);
+            if (postDomain != null)
+            {
+                var userDomain = _appDbContext.User.FirstOrDefault(ad => ad.Id == postDomain.userId);
+                if (userDomain.roleId == 1)
+                {
+                    if (userDomain != null && updatepost.FileUri != null)
+                    {
+                        if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
+                        {
+                            updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
+                            postDomain.actualFile = updatepost.actualFile;
+                        }
+                        else
+                        {
+                            updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
+                            postDomain.actualFile = updatepost.actualFile;
+                        }
+                        postDomain.title = updatepost.title;
+                        postDomain.description = updatepost.description;
+                        postDomain.address = updatepost.address;
+                        postDomain.price = updatepost.price;
+                        postDomain.status = updatepost.status;
+                        postDomain.isHire = updatepost.isHire;
+                        postDomain.area = updatepost.area;
+                    }
+                    var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
+                    if (categoryrpostDomain != null)
+                    {
+                        _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
+                        _appDbContext.SaveChanges();
+                    }
+                    foreach (var categoryid in updatepost.categoryids)
+                    {
+                        var post_category = new Post_Category()
+                        {
+                            postId = id,
+                            categoryId = categoryid,
+                        };
+                        _appDbContext.Post_Category.Add(post_category);
+                        _appDbContext.SaveChanges();
+                    }
+                    var postManage = _appDbContext.Post_Manage.FirstOrDefault(pm => pm.postId == id);
+                    postManage.userAdminId = updatepost.adminId;
+                    postManage.dateapproved = updatepost.dateApprove=DateTime.Now;
+                    _appDbContext.SaveChanges();
                 }
                 return updatepost;
             }
