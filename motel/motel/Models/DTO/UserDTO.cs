@@ -56,9 +56,5 @@ namespace motel.Models.DTO
         public IFormFile? FileUri { set; get; }
         public string? actualFile { get; set; }
     }
-    public class LoginModel
-    {
-        public string Phone { get; set; }
-        public string Password { get; set; }
-    }
+    
 }
