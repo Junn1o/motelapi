@@ -23,6 +23,7 @@ namespace motel.Models.DTO
     }
     public class UserNoIdDTO
     {
+        
         public string fullname { get; set; }
         public bool gender { get; set; }
         public string address { get; set; }
@@ -45,14 +46,19 @@ namespace motel.Models.DTO
         public string phone { get; set; }
         public int tierId { get; set; }
         public int roleId { get; set; }
-        public List<int>? post_manage_Id { get; set; }
-        public List<int>? postId { get; set; }
+        //public List<int>? post_manage_Id { get; set; }
+        //public List<int>? postId { get; set; }
         public DateTime birthday { get; set; }
         public string FormattedBirthday { get; set; }
         public DateTime datecreated { get; set; }
         public bool gender { get; set; }
         [NotMapped]
-        public IFormFile FileUri { set; get; }
-        public string actualFile { get; set; }
+        public IFormFile? FileUri { set; get; }
+        public string? actualFile { get; set; }
+    }
+    public class LoginModel
+    {
+        public string Phone { get; set; }
+        public string Password { get; set; }
     }
 }

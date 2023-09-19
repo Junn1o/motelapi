@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using motel.Data;
 using motel.Models.Domain;
@@ -19,6 +21,7 @@ namespace motel.Controllers
         {
             _dbcontext = context;
             _userRepositories = userRepositories;
+           
         }
         [HttpGet("get-all-users")]
         public IActionResult GetAll()
@@ -75,6 +78,7 @@ namespace motel.Controllers
                 return Ok("User deleted");
             }
         }
+        
 
         #region Private methods
         private bool ValidateAddUser(AddUserDTO user)
@@ -85,10 +89,10 @@ namespace motel.Controllers
                 return false;
             }
 
-            if (string.IsNullOrEmpty(user.actualFile))
-            {
-                ModelState.AddModelError(nameof(user.actualFile), "Vui lòng không để trống ảnh.");
-            }
+            //if (user.FileUri)
+            //{
+            //    ModelState.AddModelError(nameof(user.FileUri), "Vui lòng không để trống ảnh.");
+            //}
 
             if (string.IsNullOrEmpty(user.firstname))
             {

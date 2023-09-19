@@ -10,5 +10,6 @@ namespace motel.Repositories
         AddUserDTO AddUser(AddUserDTO addUser);
         AddUserDTO? UpdateUserById(int id, AddUserDTO user);
         User? DeleteUserById(int id);
+        User? Authenticate(string phone,string password);
     }
 }
