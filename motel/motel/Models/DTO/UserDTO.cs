@@ -46,8 +46,8 @@ namespace motel.Models.DTO
         public string phone { get; set; }
         public int tierId { get; set; }
         public int roleId { get; set; }
-        //public List<int>? post_manage_Id { get; set; }
-        //public List<int>? postId { get; set; }
+        public List<int>? post_manage_Id { get; set; }
+        public List<int>? postId { get; set; }
         public DateTime birthday { get; set; }
         public string FormattedBirthday { get; set; }
         public DateTime datecreated { get; set; }
