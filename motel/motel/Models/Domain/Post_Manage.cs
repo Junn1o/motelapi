@@ -9,6 +9,7 @@ namespace motel.Models.Domain
         public Post post { get; set; }
         public int? userAdminId { get; set; }
         public User user { get; set; }
+        //public bool isApprove { get; set; }
         public DateTime? dateapproved { get; set; }
     }
 }
