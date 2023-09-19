@@ -51,38 +51,50 @@ namespace motel.Repositories
         }
         public AddPostDTO AddPost(AddPostDTO addpost)
         {
-            //addpost.status = "pending";
-            addpost.dateCreated = DateTime.Now;
-            var postDomain = new Post
-            {
-                title = addpost.title,
-                price = addpost.price,
-                address = addpost.address,
-                description = addpost.description,
-                userId = addpost.userId,
-                status = addpost.status = "pending",
-                isHire = addpost.isHire,
-                area = addpost.area,
-                datecreatedroom = addpost.dateCreated,
-            };
-            _appDbContext.Add(postDomain);
-            _appDbContext.SaveChanges();
             var user = _appDbContext.User.FirstOrDefault(a => a.Id == addpost.userId);
-            if (user != null)
+            if (user.roleId == 1 || user.roleId == 5)
             {
-                addpost.actualFile = UploadImage(addpost.FileUri, user.Id, user.datecreated.ToString("yyyy"), postDomain.Id);
-                postDomain.actualFile = addpost.actualFile;
+                var postDomain = new Post
+                {
+                    title = addpost.title,
+                    price = addpost.price,
+                    address = addpost.address,
+                    description = addpost.description,
+                    userId = addpost.userId,
+                    status = addpost.status = "Đang chờ duyệt",
+                    isHire = addpost.isHire = false,
+                    area = addpost.area,
+                    datecreatedroom = addpost.dateCreated = DateTime.Now,
+                };
+                _appDbContext.Add(postDomain);
                 _appDbContext.SaveChanges();
-            }
-            foreach (var id in addpost.categoryids)
-            {
-                var post_category = new Post_Category()
+                //var user = _appDbContext.User.FirstOrDefault(a => a.Id == addpost.userId);
+                if (addpost.FileUri != null)
+                {
+                    addpost.actualFile = UploadImage(addpost.FileUri, user.Id, user.datecreated.ToString("yyyy"), postDomain.Id);
+                    postDomain.actualFile = addpost.actualFile;
+                    _appDbContext.SaveChanges();
+                }
+                foreach (var id in addpost.categoryids)
+                {
+                    var post_category = new Post_Category()
+                    {
+                        postId = postDomain.Id,
+                        categoryId = id,
+                    };
+                    _appDbContext.Post_Category.Add(post_category);
+                    _appDbContext.SaveChanges();
+                }
+                var postManage = new Post_Manage
                 {
                     postId = postDomain.Id,
-                    categoryId = id,
                 };
-                _appDbContext.Post_Category.Add(post_category);
+                _appDbContext.Post_Manage.Add(postManage);
                 _appDbContext.SaveChanges();
+            }
+            else
+            {
+                return null;
             }
             return addpost;
         }
@@ -92,48 +104,51 @@ namespace motel.Repositories
             if (postDomain != null)
             {
                 var userDomain = _appDbContext.User.FirstOrDefault(ad => ad.Id == postDomain.userId);
-                if (userDomain != null && updatepost.FileUri != null)
+                if (userDomain.roleId == 1 || userDomain.roleId == 5)
                 {
-                    if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
+                    if (userDomain != null && updatepost.FileUri != null)
                     {
-                        updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
-                        postDomain.actualFile = updatepost.actualFile;
+                        if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
+                        {
+                            updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
+                            postDomain.actualFile = updatepost.actualFile;
+                        }
+                        else
+                        {
+                            updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
+                            postDomain.actualFile = updatepost.actualFile;
+                        }
+                        postDomain.title = updatepost.title;
+                        postDomain.description = updatepost.description;
+                        postDomain.address = updatepost.address;
+                        postDomain.price = updatepost.price;
+                        postDomain.status = updatepost.status;
+                        postDomain.isHire = updatepost.isHire;
+                        postDomain.area = updatepost.area;
                     }
-                    else
+                    var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
+                    if (categoryrpostDomain != null)
                     {
-                        updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
-                        postDomain.actualFile = updatepost.actualFile;
+                        _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
+                        _appDbContext.SaveChanges();
                     }
-                    postDomain.title = updatepost.title;
-                    postDomain.description = updatepost.description;
-                    postDomain.address = updatepost.address;
-                    postDomain.price = updatepost.price;
-                    postDomain.status = updatepost.status;
-                    postDomain.isHire = updatepost.isHire;
-                    postDomain.area = updatepost.area;
-                }
-                var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
-                if (categoryrpostDomain != null)
-                {
-                    _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
-                    _appDbContext.SaveChanges();
-                }
-                foreach (var categoryid in updatepost.categoryids)
-                {
-                    var post_category = new Post_Category()
+                    foreach (var categoryid in updatepost.categoryids)
                     {
-                        postId = id,
-                        categoryId = categoryid,
-                    };
-                    _appDbContext.Post_Category.Add(post_category);
-                    _appDbContext.SaveChanges();
+                        var post_category = new Post_Category()
+                        {
+                            postId = id,
+                            categoryId = categoryid,
+                        };
+                        _appDbContext.Post_Category.Add(post_category);
+                        _appDbContext.SaveChanges();
+                    }
                 }
                 return updatepost;
             }
             else
                 return null;
         }
-        public Post? DeletePost(int id)
+        public Post DeletePost(int id)
         {
             var postDomain = _appDbContext.Post.FirstOrDefault(r => r.Id == id);
             var postCategory = _appDbContext.Post_Category.Where(n => n.postId == id);
