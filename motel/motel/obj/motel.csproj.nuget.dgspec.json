@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nphan\\source\\repos\\motelapi\\motel\\motel\\motel.csproj": {}
+    "D:\\New folder (2)\\motel\\motel\\motel.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nphan\\source\\repos\\motelapi\\motel\\motel\\motel.csproj": {
+    "D:\\New folder (2)\\motel\\motel\\motel.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nphan\\source\\repos\\motelapi\\motel\\motel\\motel.csproj",
+        "projectUniqueName": "D:\\New folder (2)\\motel\\motel\\motel.csproj",
         "projectName": "motel",
-        "projectPath": "C:\\Users\\nphan\\source\\repos\\motelapi\\motel\\motel\\motel.csproj",
+        "projectPath": "D:\\New folder (2)\\motel\\motel\\motel.csproj",
         "packagesPath": "C:\\Users\\nphan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nphan\\source\\repos\\motelapi\\motel\\motel\\obj\\",
+        "outputPath": "D:\\New folder (2)\\motel\\motel\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nphan\\AppData\\Roaming\\NuGet\\NuGet.Config",

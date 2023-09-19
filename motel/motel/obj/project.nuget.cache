@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "qlHylgJZ0ARDoEigSsZHxvv+2jtI4sFPyjIMXYxyztozRZqKfvO0qfBmZclmmPsteb0iifcmt0smLgt0DGDTDg==",
+  "dgSpecHash": "UGBenWXh5/UymUPZHaiVgwsa/aQsuc4PHhwjgKqXogV41YYk80qQ1jvLJSLXxodE0BcHZ8rePS1c0LqJtlwIkA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\nphan\\source\\repos\\motelapi\\motel\\motel\\motel.csproj",
+  "projectFilePath": "D:\\New folder (2)\\motel\\motel\\motel.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nphan\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\nphan\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
