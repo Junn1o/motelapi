@@ -24,7 +24,7 @@ namespace motel.Repositories
                 address = addUser.address,
                 gender = addUser.gender,
                 datecreated = addUser.datecreated = DateTime.Now,
-                birthday = addUser.birthday = DateTime.ParseExact(addUser.FormattedBirthday, "dd/MM/yyyy", CultureInfo.InvariantCulture),
+                birthday = DateTime.ParseExact(addUser.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture),
                 password = addUser.password,
                 phone = addUser.phone,
                 roleId = addUser.roleId,
@@ -45,8 +45,8 @@ namespace motel.Repositories
                 addUser.actualFile = Path.Combine("images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"), "avatar.png");
             }
             userDomain.actualFile = addUser.actualFile;
-            _dbContext.User.Add(userDomain);
-            _dbContext.SaveChanges();
+            //_dbContext.User.Add(userDomain);
+            //_dbContext.SaveChanges();
             return addUser;
 
         }
@@ -76,7 +76,7 @@ namespace motel.Repositories
             {
                 Id = User.Id,
                 fullname = User.firstname +" " +User.lastname,
-                gender = User.gender,
+                gender = User.gender ? "Nam" : "Nữ",
                 address = User.address,
                 password = User.password,
                 phone = User.phone,
@@ -87,7 +87,6 @@ namespace motel.Repositories
                 actualFile = User.actualFile,
             }).ToList();
             return allUsers;
-
         }
 
         UserNoIdDTO IUserRepositories.GetUserById(int id)
@@ -97,7 +96,7 @@ namespace motel.Repositories
             var UserWithIdDTO = UserbyDomain.Select(User => new UserNoIdDTO()
             {
                 fullname = User.firstname + " " + User.lastname,
-                gender = User.gender,
+                gender = User.gender ? "Nam" : "Nữ",
                 address = User.address,
                 password = User.password,
                 phone = User.phone,
@@ -131,7 +130,7 @@ namespace motel.Repositories
                 userDomain.phone = user.phone;
                 userDomain.tierId = user.tierId;
                 userDomain.roleId = user.roleId;
-                userDomain.birthday = user.birthday = DateTime.ParseExact(user.FormattedBirthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                userDomain.birthday = DateTime.ParseExact(user.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 userDomain.actualFile = user.actualFile;
                 _dbContext.SaveChanges();
             }
