@@ -128,6 +128,10 @@ namespace motel.Repositories
             }
             return user;
         }
+        User? IUserRepositories.Authenticate(string phone, string password)
+        {
+            return _dbContext.User.SingleOrDefault(u => u.phone == phone && u.password == password);
+        }
         public string UploadImage(IFormFile file, int id, string datecreated)
         {
             var fileExtension = Path.GetExtension(file.FileName);

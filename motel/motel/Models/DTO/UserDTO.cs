@@ -23,6 +23,7 @@ namespace motel.Models.DTO
     }
     public class UserNoIdDTO
     {
+        
         public string fullname { get; set; }
         public bool gender { get; set; }
         public string address { get; set; }
@@ -53,4 +54,5 @@ namespace motel.Models.DTO
         public IFormFile? FileUri { set; get; }
         public string? actualFile { get; set; }
     }
+    
 }
