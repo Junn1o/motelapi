@@ -47,7 +47,7 @@ namespace motel.Models.DTO
         public int tierId { get; set; }
         public int roleId { get; set; }
         public DateTime birthday { get; set; }
-        public string FormattedBirthday { get; set; }
+        public string? FormattedBirthday { get; set; }
         public DateTime datecreated { get; set; }
         public bool gender { get; set; }
         [NotMapped]
