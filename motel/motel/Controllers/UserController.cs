@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
@@ -89,11 +90,6 @@ namespace motel.Controllers
                 return false;
             }
 
-            //if (user.FileUri)
-            //{
-            //    ModelState.AddModelError(nameof(user.FileUri), "Vui lòng không để trống ảnh.");
-            //}
-
             if (string.IsNullOrEmpty(user.firstname))
             {
                 ModelState.AddModelError(nameof(user.firstname), "Vui lòng không để trống Tên của bạn.");
@@ -139,7 +135,15 @@ namespace motel.Controllers
 
             if (user.phone == null)
             {
-                ModelState.AddModelError(nameof(user.phone), "Vui lòng nhập số điện thoại.");
+                ModelState.AddModelError(nameof(user.phone), "Vui lòng không để trống số điện thoại.");
+            }
+            else if (_dbcontext.User.Any(u => u.phone == user.phone))
+            {
+                ModelState.AddModelError(nameof(user.phone), "Số điện thoại này đã được đăng ký bởi người dùng khác.");
+            }
+            if (user.phone == null)
+            {
+                ModelState.AddModelError(nameof(user.phone), " Số điện thoại đã được sử dụng cho một tài khoản nào đó vui lòng nhập số khác");
             }
 
             if (user.birthday == null)
