@@ -34,20 +34,16 @@ namespace motel.Controllers
         [HttpPost("add-user")]
         public IActionResult AddUser([FromForm] AddUserDTO addUserDTO)
         {
-            try
+            if (!ValidateAddUser(addUserDTO))
             {
-                if (!ValidateAddUser(addUserDTO))
-                {
-                    return BadRequest(ModelState);
-                }
-                if (ModelState.IsValid)
-                {
-                    var userAdd = _userRepositories.AddUser(addUserDTO);
-                    return Ok(userAdd);
-                }
-                else return BadRequest(ModelState);
+                return BadRequest(ModelState);
             }
-            catch (Exception e) { return BadRequest(e); }
+            if (ModelState.IsValid)
+            {
+                var userAdd = _userRepositories.AddUser(addUserDTO);
+                return Ok(userAdd);
+            }
+            else return BadRequest(ModelState);
         }
         [HttpGet("get-user-with-id")]
         public IActionResult GetUserwithId(int id)

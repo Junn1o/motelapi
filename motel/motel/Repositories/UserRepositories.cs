@@ -17,27 +17,36 @@ namespace motel.Repositories
         }
         AddUserDTO IUserRepositories.AddUser(AddUserDTO addUser)
         {
+            var userDomain = new User
+            {
+                firstname = addUser.firstname,
+                lastname = addUser.lastname,
+                address = addUser.address,
+                gender = addUser.gender,
+                datecreated = addUser.datecreated = DateTime.Now,
+                birthday = addUser.birthday = DateTime.ParseExact(addUser.FormattedBirthday, "dd/MM/yyyy", CultureInfo.InvariantCulture),
+                password = addUser.password,
+                phone = addUser.phone,
+                roleId = addUser.roleId,
+                tierId = addUser.tierId = 1,
+                FileUri = addUser.FileUri
+            };
             if (addUser.FileUri != null)
             {
-                var userDomain = new User
-                {
-                    firstname = addUser.firstname,
-                    lastname = addUser.lastname,
-                    address = addUser.address,
-                    gender = addUser.gender,
-                    datecreated = addUser.datecreated = DateTime.Now,
-                    birthday = addUser.birthday = DateTime.ParseExact(addUser.FormattedBirthday, "dd/MM/yyyy", CultureInfo.InvariantCulture),
-                    password = addUser.password,
-                    phone = addUser.phone,
-                    roleId = addUser.roleId,
-                    tierId = addUser.tierId = 1,
-                    FileUri = addUser.FileUri,
-                };
                 addUser.actualFile = UploadImage(addUser.FileUri, userDomain.Id, addUser.datecreated.ToString("yyyy"));
-                userDomain.actualFile = addUser.actualFile;
-                _dbContext.User.Add(userDomain);
-                _dbContext.SaveChanges();
             }
+            else
+            {
+                var defaultimage = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "user", "noavt.png");
+                var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot", "images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"));
+                Directory.CreateDirectory(uploadFolderPath);
+                var filePath = Path.Combine(uploadFolderPath, "avatar.png");
+                File.Copy(defaultimage, filePath, true);
+                addUser.actualFile = Path.Combine("images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"), "avatar.png");
+            }
+            userDomain.actualFile = addUser.actualFile;
+            _dbContext.User.Add(userDomain);
+            _dbContext.SaveChanges();
             return addUser;
 
         }
