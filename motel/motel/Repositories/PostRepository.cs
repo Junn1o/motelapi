@@ -106,7 +106,7 @@ namespace motel.Repositories
                 var userDomain = _appDbContext.User.FirstOrDefault(ad => ad.Id == postDomain.userId);
                 if (userDomain.roleId == 1 || userDomain.roleId == 5)
                 {
-                    if (userDomain != null && updatepost.FileUri != null)
+                    if (userDomain != null)
                     {
                         if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
                         {
@@ -156,7 +156,7 @@ namespace motel.Repositories
                 var userDomain = _appDbContext.User.FirstOrDefault(ad => ad.Id == postDomain.userId);
                 if (userDomain.roleId == 1)
                 {
-                    if (userDomain != null && updatepost.FileUri != null)
+                    if (userDomain != null)
                     {
                         if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
                         {
