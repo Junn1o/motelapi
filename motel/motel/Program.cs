@@ -13,6 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IUserRepositories, UserRepositories>();
 builder.Services.AddScoped<ITierRepositories, TierRepositories>();
 builder.Services.AddScoped<IRoleRepositories, RoleRepositories>();
