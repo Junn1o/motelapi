@@ -23,7 +23,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ITierRepositories, TierRepositories>();
 builder.Services.AddScoped<IRoleRepositories, RoleRepositories>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
- option.TokenValidationParameters = new TokenValidationParameters
+option.TokenValidationParameters = new TokenValidationParameters
  {
      ValidateIssuer = true,
      ValidateAudience = true,
@@ -35,12 +35,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
      IssuerSigningKey = new SymmetricSecurityKey(
  Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
  });
-builder.Services.Configure<FormOptions>(o =>
-{
-    o.ValueLengthLimit = int.MaxValue;
-    o.MultipartBodyLengthLimit = int.MaxValue;
-    o.MemoryBufferThreshold = int.MaxValue;
-});
 var app = builder.Build();
 app.UseAuthentication();
 // Configure the HTTP request pipeline.
