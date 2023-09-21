@@ -45,8 +45,8 @@ namespace motel.Repositories
                 addUser.actualFile = Path.Combine("images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"), "avatar.png");
             }
             userDomain.actualFile = addUser.actualFile;
-            //_dbContext.User.Add(userDomain);
-            //_dbContext.SaveChanges();
+            _dbContext.User.Add(userDomain);
+            _dbContext.SaveChanges();
             return addUser;
 
         }
