@@ -23,7 +23,7 @@ namespace motel.Repositories
                 price = p.price,
                 actualFile = GetImageFromString(p.actualFile),
                 area = p.area,
-                isHire = p.isHire,
+                isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
                 status = p.status,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
@@ -42,7 +42,7 @@ namespace motel.Repositories
                 price = p.price,
                 actualFile = p.actualFile,
                 area = p.area,
-                isHire = p.isHire,
+                isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
                 status = p.status,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
@@ -62,9 +62,9 @@ namespace motel.Repositories
                     description = addpost.description,
                     userId = addpost.userId,
                     status = addpost.status = "Đang chờ duyệt",
-                    isHire = addpost.isHire = false,
+                    isHire = (bool)(addpost.isHire = false),
                     area = addpost.area,
-                    datecreatedroom = addpost.dateCreated = DateTime.Now,
+                    datecreatedroom = (DateTime)(addpost.dateCreated = DateTime.Now),
                 };
                 _appDbContext.Add(postDomain);
                 _appDbContext.SaveChanges();
@@ -123,7 +123,7 @@ namespace motel.Repositories
                         postDomain.address = updatepost.address;
                         postDomain.price = updatepost.price;
                         postDomain.status = updatepost.status;
-                        postDomain.isHire = updatepost.isHire;
+                        postDomain.isHire = (bool)updatepost.isHire;
                         postDomain.area = updatepost.area;
                     }
                     var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();

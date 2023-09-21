@@ -23,7 +23,7 @@ namespace motel.Repositories
                 lastname = addUser.lastname,
                 address = addUser.address,
                 gender = addUser.gender,
-                datecreated = addUser.datecreated = DateTime.Now,
+                datecreated = (DateTime)(addUser.datecreated = DateTime.Now),
                 birthday = DateTime.ParseExact(addUser.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture),
                 password = addUser.password,
                 phone = addUser.phone,
