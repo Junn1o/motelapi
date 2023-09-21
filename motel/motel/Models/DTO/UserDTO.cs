@@ -1,6 +1,8 @@
 ﻿using motel.Models.Domain;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace motel.Models.DTO
 {
@@ -8,7 +10,7 @@ namespace motel.Models.DTO
     {
         public int Id { get; set; }
        public string fullname { get; set; }
-        public bool gender { get; set; }
+        public string gender { get; set; }
         public string address { get; set; }
         public string password { get; set; }
         public string phone { get; set; }
@@ -25,7 +27,7 @@ namespace motel.Models.DTO
     {
         
         public string fullname { get; set; }
-        public bool gender { get; set; }
+        public string gender { get; set; }
         public string address { get; set; }
         public string password { get; set; }
         public string phone { get; set; }
@@ -46,11 +48,11 @@ namespace motel.Models.DTO
         public string phone { get; set; }
         public int tierId { get; set; }
         public int roleId { get; set; }
-        public DateTime birthday { get; set; }
-        public string? FormattedBirthday { get; set; }
+        //public DateTime birthday { get; set; }
+        public string? birthday { get; set; }
         public DateTime datecreated { get; set; }
         public bool gender { get; set; }
-        [NotMapped]
+        [JsonIgnore]
         public IFormFile? FileUri { set; get; }
         public string? actualFile { get; set; }
     }
