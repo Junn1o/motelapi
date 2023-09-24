@@ -55,6 +55,7 @@ namespace motel.Controllers
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.firstname),
+            new Claim(ClaimTypes.Name, user.lastname),
             // Thêm các claims khác nếu cần
         };
 
