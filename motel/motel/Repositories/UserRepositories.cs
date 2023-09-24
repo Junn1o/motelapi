@@ -2,6 +2,7 @@
 using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
+using System.Data;
 using System.Globalization;
 using System.Net;
 using System.Numerics;
@@ -53,21 +54,36 @@ namespace motel.Repositories
 
         User? IUserRepositories.DeleteUserById(int id)
         {
-            var userDomain = _dbContext.User.FirstOrDefault(r => r.Id == id);
+            var userDomain = _dbContext.User.FirstOrDefault(c => c.Id == id);
+            var userPost = _dbContext.Post.Where(up => up.userId == id).ToList();
+            var userManager = _dbContext.Post_Manage.Where(um => um.postId == id).ToList();
             if (userDomain != null)
             {
-                if (DeleteImage(userDomain.actualFile) == true)
+                
+                if (userPost.Any())
                 {
+                    foreach (var post in userPost)
+                    {
+                        var userPostCategory = _dbContext.Post_Category.Where(n => n.postId == post.Id).ToList();
+                        if (userPostCategory.Any())
+                        {
+                            _dbContext.Post_Category.RemoveRange(userPostCategory);
+                            _dbContext.SaveChanges();
+                        }
+                    }
                     DeleteImage(userDomain.actualFile);
+                    _dbContext.Post.RemoveRange(userPost);
+                    _dbContext.SaveChanges();
+                    _dbContext.User.Remove(userDomain);
+                    _dbContext.SaveChanges();
                 }
-                _dbContext.User.Remove(userDomain);
-                _dbContext.SaveChanges();
-                return userDomain;
+                else
+                {
+                    _dbContext.User.Remove(userDomain);
+                    _dbContext.SaveChanges();
+                }
             }
-            else
-            {
-                return null;
-            }
+            return userDomain;
         }
 
         List<UserDTO> IUserRepositories.GetAllUser()
@@ -75,7 +91,8 @@ namespace motel.Repositories
             var allUsers = _dbContext.User.Select(User => new UserDTO()
             {
                 Id = User.Id,
-                fullname = User.firstname +" " +User.lastname,
+                firstname = User.firstname, 
+                lastname =User.lastname,
                 gender = User.gender ? "Nam" : "Nữ",
                 address = User.address,
                 password = User.password,
@@ -83,6 +100,7 @@ namespace motel.Repositories
                 tier = User.tiers.tiername,
                 rolename = User.role.rolename,
                 birthday = User.birthday.ToString("dd/MM/yyyy"),
+                posts = User.post.Select(post => post.Id).ToList(),
                 datecreated = User.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = User.actualFile,
             }).ToList();
@@ -102,6 +120,7 @@ namespace motel.Repositories
                 phone = User.phone,
                 tier = User.tiers.tiername,
                 rolename = User.role.rolename,
+                posts = User.post.Select(post => post.Id).ToList(),
                 birthday = User.birthday.ToString("dd/MM/yyyy"),
                 datecreated = User.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = User.actualFile,
