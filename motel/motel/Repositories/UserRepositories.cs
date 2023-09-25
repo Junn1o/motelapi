@@ -32,6 +32,8 @@ namespace motel.Repositories
                 tierId = addUser.tierId = 1,
                 FileUri = addUser.FileUri
             };
+            _dbContext.User.Add(userDomain);
+            _dbContext.SaveChanges();
             if (addUser.FileUri != null)
             {
                 addUser.actualFile = UploadImage(addUser.FileUri, userDomain.Id, addUser.datecreated.ToString("yyyy"));
@@ -46,7 +48,6 @@ namespace motel.Repositories
                 addUser.actualFile = Path.Combine("images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"), "avatar.png");
             }
             userDomain.actualFile = addUser.actualFile;
-            _dbContext.User.Add(userDomain);
             _dbContext.SaveChanges();
             return addUser;
 
@@ -128,18 +129,21 @@ namespace motel.Repositories
             return UserWithIdDTO;
         }
 
-        AddUserDTO? IUserRepositories.UpdateUserById(int id,AddUserDTO user)
+        AddUserDTO? IUserRepositories.UpdateUserById(int id, AddUserDTO user)
         {
             var userDomain = _dbContext.User.FirstOrDefault(u => u.Id == id);
             if (userDomain != null)
             {
-                if (UpdateImage(user.FileUri, userDomain.actualFile, id, userDomain.datecreated.ToString("yyyy")) == null)
-                {
-                    user.actualFile = UploadImage(user.FileUri, id, userDomain.datecreated.ToString("yyyy"));
-                }
-                else
+                if (user.FileUri != null)
                 {
                     user.actualFile = UpdateImage(user.FileUri, userDomain.actualFile, id, userDomain.datecreated.ToString("yyyy"));
+                    userDomain.FileUri = user.FileUri;
+                    userDomain.actualFile = user.actualFile;
+                }
+                if (user.FileUri == null && userDomain.actualFile !=null)
+                {
+                    user.actualFile = userDomain.actualFile.ToString();
+                    userDomain.actualFile = user.actualFile;
                 }
                 userDomain.firstname = user.firstname;
                 userDomain.lastname = user.lastname;
@@ -150,7 +154,6 @@ namespace motel.Repositories
                 userDomain.tierId = user.tierId;
                 userDomain.roleId = user.roleId;
                 userDomain.birthday = DateTime.ParseExact(user.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                userDomain.actualFile = user.actualFile;
                 _dbContext.SaveChanges();
             }
             return user;
@@ -179,7 +182,8 @@ namespace motel.Repositories
                 var oldFullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", currentpath);
                 if (!File.Exists(oldFullPath))
                 {
-                    return null;
+                    var newPath = UploadImage(file, id, datecreated);
+                    return newPath;
                 }
                 else
                 {
@@ -190,7 +194,8 @@ namespace motel.Repositories
             }
             else
             {
-                return null;
+                var newPath = UploadImage(file, id, datecreated);
+                return newPath;
             }
         }
         public bool DeleteImage(string imagePath)

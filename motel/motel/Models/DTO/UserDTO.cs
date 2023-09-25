@@ -53,7 +53,6 @@ namespace motel.Models.DTO
         public string? birthday { get; set; }
         public DateTime datecreated { get; set; }
         public bool gender { get; set; }
-        [JsonIgnore]
         public IFormFile? FileUri { set; get; }
         public string? actualFile { get; set; }
     }
