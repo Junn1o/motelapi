@@ -35,6 +35,25 @@ option.TokenValidationParameters = new TokenValidationParameters
      IssuerSigningKey = new SymmetricSecurityKey(
  Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
  });
+
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = int.MaxValue;
+    o.MemoryBufferThreshold = int.MaxValue;
+});
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "MyPolicy",
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7139", "http://localhost:5088", "http://localhost:3000")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
 var app = builder.Build();
 app.UseAuthentication();
 // Configure the HTTP request pipeline.
@@ -43,7 +62,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("MyPolicy");
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

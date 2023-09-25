@@ -9,7 +9,8 @@ namespace motel.Models.DTO
     public class UserDTO
     {
         public int Id { get; set; }
-       public string fullname { get; set; }
+        public string firstname { get; set; }
+        public string lastname { get; set; }
         public string gender { get; set; }
         public string address { get; set; }
         public string password { get; set; }
@@ -20,7 +21,7 @@ namespace motel.Models.DTO
         public string birthday { get; set; }
         public string datecreated { get; set; }
         //public List<string> post_manages { get; set; }
-        //public List<string> posts { get; set; }
+        public List<int> posts { get; set; }
 
     }
     public class UserNoIdDTO
@@ -37,7 +38,7 @@ namespace motel.Models.DTO
         public string birthday { get; set; }
         public string datecreated { get; set; }
         //public List<string> post_manages { get; set; }
-        //public List<string> posts { get; set; }
+        public List<int> posts { get; set; }
     }
     public class AddUserDTO
     {
@@ -52,7 +53,6 @@ namespace motel.Models.DTO
         public string? birthday { get; set; }
         public DateTime datecreated { get; set; }
         public bool gender { get; set; }
-        [JsonIgnore]
         public IFormFile? FileUri { set; get; }
         public string? actualFile { get; set; }
     }

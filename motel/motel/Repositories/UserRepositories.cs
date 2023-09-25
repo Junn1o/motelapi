@@ -2,6 +2,7 @@
 using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
+using System.Data;
 using System.Globalization;
 using System.Net;
 using System.Numerics;
@@ -31,6 +32,8 @@ namespace motel.Repositories
                 tierId = addUser.tierId = 1,
                 FileUri = addUser.FileUri
             };
+            _dbContext.User.Add(userDomain);
+            _dbContext.SaveChanges();
             if (addUser.FileUri != null)
             {
                 addUser.actualFile = UploadImage(addUser.FileUri, userDomain.Id, addUser.datecreated.ToString("yyyy"));
@@ -45,7 +48,6 @@ namespace motel.Repositories
                 addUser.actualFile = Path.Combine("images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"), "avatar.png");
             }
             userDomain.actualFile = addUser.actualFile;
-            _dbContext.User.Add(userDomain);
             _dbContext.SaveChanges();
             return addUser;
 
@@ -53,21 +55,36 @@ namespace motel.Repositories
 
         User? IUserRepositories.DeleteUserById(int id)
         {
-            var userDomain = _dbContext.User.FirstOrDefault(r => r.Id == id);
+            var userDomain = _dbContext.User.FirstOrDefault(c => c.Id == id);
+            var userPost = _dbContext.Post.Where(up => up.userId == id).ToList();
+            var userManager = _dbContext.Post_Manage.Where(um => um.postId == id).ToList();
             if (userDomain != null)
             {
-                if (DeleteImage(userDomain.actualFile) == true)
+                
+                if (userPost.Any())
                 {
+                    foreach (var post in userPost)
+                    {
+                        var userPostCategory = _dbContext.Post_Category.Where(n => n.postId == post.Id).ToList();
+                        if (userPostCategory.Any())
+                        {
+                            _dbContext.Post_Category.RemoveRange(userPostCategory);
+                            _dbContext.SaveChanges();
+                        }
+                    }
                     DeleteImage(userDomain.actualFile);
+                    _dbContext.Post.RemoveRange(userPost);
+                    _dbContext.SaveChanges();
+                    _dbContext.User.Remove(userDomain);
+                    _dbContext.SaveChanges();
                 }
-                _dbContext.User.Remove(userDomain);
-                _dbContext.SaveChanges();
-                return userDomain;
+                else
+                {
+                    _dbContext.User.Remove(userDomain);
+                    _dbContext.SaveChanges();
+                }
             }
-            else
-            {
-                return null;
-            }
+            return userDomain;
         }
 
         List<UserDTO> IUserRepositories.GetAllUser()
@@ -75,7 +92,8 @@ namespace motel.Repositories
             var allUsers = _dbContext.User.Select(User => new UserDTO()
             {
                 Id = User.Id,
-                fullname = User.firstname +" " +User.lastname,
+                firstname = User.firstname, 
+                lastname =User.lastname,
                 gender = User.gender ? "Nam" : "Nữ",
                 address = User.address,
                 password = User.password,
@@ -83,6 +101,7 @@ namespace motel.Repositories
                 tier = User.tiers.tiername,
                 rolename = User.role.rolename,
                 birthday = User.birthday.ToString("dd/MM/yyyy"),
+                posts = User.post.Select(post => post.Id).ToList(),
                 datecreated = User.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = User.actualFile,
             }).ToList();
@@ -102,6 +121,7 @@ namespace motel.Repositories
                 phone = User.phone,
                 tier = User.tiers.tiername,
                 rolename = User.role.rolename,
+                posts = User.post.Select(post => post.Id).ToList(),
                 birthday = User.birthday.ToString("dd/MM/yyyy"),
                 datecreated = User.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = User.actualFile,
@@ -109,18 +129,21 @@ namespace motel.Repositories
             return UserWithIdDTO;
         }
 
-        AddUserDTO? IUserRepositories.UpdateUserById(int id,AddUserDTO user)
+        AddUserDTO? IUserRepositories.UpdateUserById(int id, AddUserDTO user)
         {
             var userDomain = _dbContext.User.FirstOrDefault(u => u.Id == id);
             if (userDomain != null)
             {
-                if (UpdateImage(user.FileUri, userDomain.actualFile, id, userDomain.datecreated.ToString("yyyy")) == null)
-                {
-                    user.actualFile = UploadImage(user.FileUri, id, userDomain.datecreated.ToString("yyyy"));
-                }
-                else
+                if (user.FileUri != null)
                 {
                     user.actualFile = UpdateImage(user.FileUri, userDomain.actualFile, id, userDomain.datecreated.ToString("yyyy"));
+                    userDomain.FileUri = user.FileUri;
+                    userDomain.actualFile = user.actualFile;
+                }
+                if (user.FileUri == null && userDomain.actualFile !=null)
+                {
+                    user.actualFile = userDomain.actualFile.ToString();
+                    userDomain.actualFile = user.actualFile;
                 }
                 userDomain.firstname = user.firstname;
                 userDomain.lastname = user.lastname;
@@ -131,7 +154,6 @@ namespace motel.Repositories
                 userDomain.tierId = user.tierId;
                 userDomain.roleId = user.roleId;
                 userDomain.birthday = DateTime.ParseExact(user.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                userDomain.actualFile = user.actualFile;
                 _dbContext.SaveChanges();
             }
             return user;
@@ -160,7 +182,8 @@ namespace motel.Repositories
                 var oldFullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", currentpath);
                 if (!File.Exists(oldFullPath))
                 {
-                    return null;
+                    var newPath = UploadImage(file, id, datecreated);
+                    return newPath;
                 }
                 else
                 {
@@ -171,7 +194,8 @@ namespace motel.Repositories
             }
             else
             {
-                return null;
+                var newPath = UploadImage(file, id, datecreated);
+                return newPath;
             }
         }
         public bool DeleteImage(string imagePath)
