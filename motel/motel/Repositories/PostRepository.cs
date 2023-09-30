@@ -234,14 +234,14 @@ namespace motel.Repositories
             {
                 string count = $"{counter++}";
                 var fileEx = Path.GetExtension(image.FileName);
-                var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "author", id + "-" + adatecreated, "uploads", roomid.ToString());
+                var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "user", id + "-" + adatecreated, "uploads", roomid.ToString());
                 Directory.CreateDirectory(uploadFolderPath);
                 var filePath = Path.Combine(uploadFolderPath, roomid + "-" + "image_" + count + fileEx);
                 using (FileStream ms = new FileStream(filePath, FileMode.Create))
                 {
                     image.CopyTo(ms);
                 }
-                string relativePath = Path.Combine("images", "author", id + "-" + adatecreated, "uploads", roomid.ToString(), roomid + "-" + "image_" + count + fileEx);
+                string relativePath = Path.Combine("images", "user", id + "-" + adatecreated, "uploads", roomid.ToString(), roomid + "-" + "image_" + count + fileEx);
                 picture += relativePath + ";";
             }
             return picture;
@@ -253,7 +253,7 @@ namespace motel.Repositories
             string[] parts = existingImagePaths[0].Split('\\');
             string idAndDate = parts[2];
             string roomid = parts[4];
-            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "author", idAndDate, "uploads", roomid);
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "user", idAndDate, "uploads", roomid);
             if (!File.Exists(existingImagePaths[0]))
             {
                 return null;
@@ -271,7 +271,7 @@ namespace motel.Repositories
                     {
                         image.CopyTo(ms);
                     }
-                    string relativePath = Path.Combine("images", "author", idAndDate, "uploads", fileName + Path.GetExtension(image.FileName));
+                    string relativePath = Path.Combine("images", "user", idAndDate, "uploads", fileName + Path.GetExtension(image.FileName));
                     picture += relativePath + ";";
                 }
                 return picture;
