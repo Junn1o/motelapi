@@ -381,7 +381,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/motel/motel/obj/Debug/net7.0/motel.assets.cache
+/motel/motel/obj/Debug/
 /motel/motel/obj/motel.csproj.nuget.dgspec.json
 /motel/motel/obj/motel.csproj.nuget.g.targets
 /motel/motel/obj/motel.csproj.nuget.g.props
