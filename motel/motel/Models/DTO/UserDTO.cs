@@ -56,5 +56,20 @@ namespace motel.Models.DTO
         public IFormFile? FileUri { set; get; }
         public string? actualFile { get; set; }
     }
-    
+    public class UpdateUserBasic
+    {
+        public string firstname { get; set; }
+        public string lastname { get; set; }
+        public string address { get; set; }
+        public bool gender { get; set; }
+        public string? birthday { get; set; }
+        public string phone { get; set; }
+
+    }
+    public class UserListResult
+    {
+        public List<UserDTO> Users { get; set; }
+        public int total { get; set; }
+        public int TotalPages { get; set; }
+    }
 }
