@@ -108,15 +108,24 @@ namespace motel.Repositories
                 {
                     if (userDomain != null)
                     {
-                        if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
+                        if (updatepost.FileUri != null)
                         {
-                            updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
-                            postDomain.actualFile = updatepost.actualFile;
+                            if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
+                            {
+                                updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
+                                postDomain.actualFile = updatepost.actualFile;
+                                postDomain.FileUri = updatepost.FileUri;
+                            }
+                            else
+                            {
+                                updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
+                                postDomain.actualFile = updatepost.actualFile;
+                                postDomain.FileUri = updatepost.FileUri;
+                            }
                         }
                         else
                         {
-                            updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
-                            postDomain.actualFile = updatepost.actualFile;
+                            postDomain.actualFile = updatepost.actualFile = postDomain.actualFile;
                         }
                         postDomain.title = updatepost.title;
                         postDomain.description = updatepost.description;
@@ -158,15 +167,24 @@ namespace motel.Repositories
                 {
                     if (userDomain != null)
                     {
-                        if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
+                        if (updatepost.FileUri != null)
                         {
-                            updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
-                            postDomain.actualFile = updatepost.actualFile;
+                            if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
+                            {
+                                updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
+                                postDomain.actualFile = updatepost.actualFile;
+                                postDomain.FileUri = updatepost.FileUri;
+                            }
+                            else
+                            {
+                                updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
+                                postDomain.actualFile = updatepost.actualFile;
+                                postDomain.FileUri = updatepost.FileUri;
+                            }
                         }
                         else
                         {
-                            updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
-                            postDomain.actualFile = updatepost.actualFile;
+                            postDomain.actualFile = updatepost.actualFile = postDomain.actualFile;
                         }
                         postDomain.title = updatepost.title;
                         postDomain.description = updatepost.description;
