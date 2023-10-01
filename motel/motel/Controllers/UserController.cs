@@ -7,6 +7,7 @@ using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
 using motel.Repositories;
+using System.ComponentModel.DataAnnotations;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace motel.Controllers
@@ -22,28 +23,21 @@ namespace motel.Controllers
         {
             _dbcontext = context;
             _userRepositories = userRepositories;
-           
+
         }
         [HttpGet("get-all-users")]
-        public IActionResult GetAll()
+        public IActionResult GetAll([FromQuery] int pageNumber = 1, [FromQuery]  int pageSize = 5)
         {
             // su dung reposity pattern 
-            var allUsers = _userRepositories.GetAllUser();
+            var allUsers = _userRepositories.GetAllUser(pageNumber,pageSize);
             return Ok(allUsers);
+            
         }
         [HttpPost("add-user")]
         public IActionResult AddUser([FromForm] AddUserDTO addUserDTO)
         {
-            if (!ValidateAddUser(addUserDTO))
-            {
-                return BadRequest(ModelState);
-            }
-            if (ModelState.IsValid)
-            {
-                var userAdd = _userRepositories.AddUser(addUserDTO);
-                return Ok(userAdd);
-            }
-            else return BadRequest(ModelState);
+            var userAdd = _userRepositories.AddUser(addUserDTO);
+            return Ok();
         }
         [HttpGet("get-user-with-id")]
         public IActionResult GetUserwithId(int id)
@@ -57,9 +51,15 @@ namespace motel.Controllers
                 return NotFound("Data Empty");
         }
         [HttpPut("update-user-with-id")]
-        public IActionResult UpdateUser(int id, [FromForm] AddUserDTO updateUser)
+        public IActionResult UpdateUser(int id,[FromForm] AddUserDTO updateUser)
         {
             var userUpdate = _userRepositories.UpdateUserById(id, updateUser);
+            return Ok(userUpdate);
+        }
+        [HttpPut("update-userbasic")]
+        public IActionResult UpdateUserBasic(int id, UpdateUserBasic updateUserBasic)
+        {
+            var userUpdate = _userRepositories.UpdateUser(id, updateUserBasic);
             return Ok(userUpdate);
         }
         [HttpDelete("delete-user-with-id")]
@@ -77,113 +77,7 @@ namespace motel.Controllers
         }
         
 
-        #region Private methods
-        private bool ValidateAddUser(AddUserDTO user)
-        {
-            if (user == null)
-            {
-                ModelState.AddModelError(nameof(user), "Vui lòng thêm thông tin.");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(user.firstname))
-            {
-                ModelState.AddModelError(nameof(user.firstname), "Vui lòng không để trống Tên của bạn.");
-            }
-
-            if (string.IsNullOrEmpty(user.lastname))
-            {
-                ModelState.AddModelError(nameof(user.lastname), "Vui lòng không để trống Họ của bạn.");
-            }
-
-            if (user.birthday == null)
-            {
-                ModelState.AddModelError(nameof(user.birthday), "Vui lòng không để trống ngày sinh.");
-            }
-
-            if (user.tierId == null)
-            {
-                ModelState.AddModelError(nameof(user.tierId), "Vui lòng lựa chọn gói.");
-            }
-            else
-            {
-                // Thực hiện kiểm tra giá trị tierId có hợp lệ hay không
-                // Ví dụ: nếu tierId không hợp lệ, thêm lỗi vào ModelState
-                if (!IsValidTierId(user.tierId))
-                {
-                    ModelState.AddModelError(nameof(user.tierId), "Gói không hợp lệ.");
-                }
-            }
-
-            if (user.roleId == null)
-            {
-                ModelState.AddModelError(nameof(user.roleId), "Vui lòng lựa chọn vai trò.");
-            }
-            else
-            {
-                // Thực hiện kiểm tra giá trị roleId có hợp lệ hay không
-                // Ví dụ: nếu roleId không hợp lệ, thêm lỗi vào ModelState
-                if (!IsValidRoleId(user.roleId))
-                {
-                    ModelState.AddModelError(nameof(user.roleId), "Vai trò không hợp lệ.");
-                }
-            }
-
-            if (user.phone == null)
-            {
-                ModelState.AddModelError(nameof(user.phone), "Vui lòng không để trống số điện thoại.");
-            }
-            else if (_dbcontext.User.Any(u => u.phone == user.phone))
-            {
-                ModelState.AddModelError(nameof(user.phone), "Số điện thoại này đã được đăng ký bởi người dùng khác.");
-            }
-            if (user.phone == null)
-            {
-                ModelState.AddModelError(nameof(user.phone), " Số điện thoại đã được sử dụng cho một tài khoản nào đó vui lòng nhập số khác");
-            }
-
-            if (user.birthday == null)
-            {
-                ModelState.AddModelError(nameof(user.birthday), "Vui lòng không để trống ngày sinh.");
-            }
-
-            if (string.IsNullOrEmpty(user.address))
-            {
-                ModelState.AddModelError(nameof(user.address), "Vui lòng không để trống Địa chỉ.");
-            }
-
-            if (ModelState.ErrorCount > 0)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private bool IsValidTierId(int? tierId)
-        {
-            if (tierId == null)
-            {
-                return false; // Nếu tierId là null, không hợp lệ
-            }
-
-            // Thực hiện kiểm tra giá trị tierId có hợp lệ hay không
-            // Ví dụ: Chỉ cho phép giá trị 1 hoặc 2 là hợp lệ
-            return tierId == 1 || tierId == 2;
-        }
-
-        private bool IsValidRoleId(int? roleId)
-        {
-            if (roleId == null)
-            {
-                return false; // Nếu roleId là null, không hợp lệ
-            }
-
-            // Thực hiện kiểm tra giá trị roleId có hợp lệ hay không
-            // Ví dụ: Chỉ cho phép giá trị 1 hoặc 2 là hợp lệ
-            return roleId == 1 || roleId == 2;
-        }
-
-        #endregion
+        
 
     }
 }
