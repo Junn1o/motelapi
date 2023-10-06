@@ -9,6 +9,7 @@ using motel.Models.DTO;
 using motel.Repositories;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,31 +32,59 @@ namespace motel.Controllers
         [HttpPost]
         public IActionResult Login([FromBody] LoginModel model)
         {
-            // Kiểm tra thông tin đăng nhập
             var authenticatedUser = _userRepository.Authenticate(model.Phone, model.Password);
 
             if (authenticatedUser == null)
             {
-                return Unauthorized(); // Trả về lỗi 401 Unauthorized nếu thông tin không hợp lệ.
+                return Unauthorized();
             }
 
-            // Tạo và phát sinh JWT token
             var token = GenerateJwtToken(authenticatedUser);
 
-            return Ok(new { Token = token });
+            // Trích xuất thông tin từ token
+            var claimsPrincipal = GetClaimsPrincipalFromToken(token);
+
+            // Lấy thông tin từ claims
+            var userId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userFirstName = claimsPrincipal.FindFirst(ClaimTypes.GivenName)?.Value;
+            var userLastName = claimsPrincipal.FindFirst(ClaimTypes.Surname)?.Value;
+            var userGender = claimsPrincipal.FindFirst(ClaimTypes.Gender)?.Value;
+            var userRoleId = claimsPrincipal.FindFirst(ClaimTypes.Role)?.Value;
+            var userTiersId = claimsPrincipal.FindFirst(ClaimTypes.UserData)?.Value;
+            var userAddress = claimsPrincipal.FindFirst(ClaimTypes.StreetAddress)?.Value;
+            var userBirthday = claimsPrincipal.FindFirst(ClaimTypes.DateOfBirth)?.Value;
+
+
+            // Sử dụng thông tin như cần
+            // ...
+
+            return Ok(new
+            {
+                Token = token,
+                UserId = userId,
+                FirstName = userFirstName,
+                LastName = userLastName,
+                Gender = userGender,
+                RoleId = userRoleId,
+                TiersId = userTiersId,
+                Address = userAddress,
+                Birthday = userBirthday,
+            });
         }
 
         private string GenerateJwtToken(User user)
         {
-            // Tạo mã token ở đây sử dụng các thư viện phù hợp (ví dụ: System.IdentityModel.Tokens.Jwt)
-            // Trong ví dụ này, chúng ta sẽ sử dụng System.IdentityModel.Tokens.Jwt để tạo token.
-
-            // Cài đặt các thông tin cần thiết cho token payload (claims)
             var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.firstname),
-            new Claim(ClaimTypes.Name, user.lastname),
+            new Claim(ClaimTypes.GivenName, user.firstname), // Sử dụng GivenName thay vì Name cho tên
+            new Claim(ClaimTypes.Surname, user.lastname),    // Sử dụng Surname thay vì Name cho họ
+            new Claim(ClaimTypes.Gender, user.gender ? "Nam" : "Nữ"),
+            new Claim(ClaimTypes.Role, user.roleId.ToString()),
+            new Claim(ClaimTypes.UserData, user.tierId.ToString()), // Sử dụng UserData cho thông tin người dùng khác
+            new Claim(ClaimTypes.StreetAddress, user.address), // Sử dụng StreetAddress cho địa chỉ
+                new Claim(ClaimTypes.DateOfBirth, user.birthday.ToString("yyyy-MM-dd")), // Sử dụng DateOfBirth cho ngày sinh, và định dạng ISO 8601
+
             // Thêm các claims khác nếu cần
         };
 
@@ -72,6 +101,29 @@ namespace motel.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        private ClaimsPrincipal GetClaimsPrincipalFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            return new ClaimsPrincipal(tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out validatedToken));
         }
     }
 

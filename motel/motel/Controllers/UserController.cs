@@ -59,8 +59,13 @@ namespace motel.Controllers
         [HttpPut("update-userbasic")]
         public IActionResult UpdateUserBasic(int id, UpdateUserBasic updateUserBasic)
         {
-            var userUpdate = _userRepositories.UpdateUser(id, updateUserBasic);
-            return Ok(userUpdate);
+            var user = _userRepositories.UpdateUser(id , updateUserBasic);
+            if (user != null)
+            {
+                return Ok(user);
+            }
+            else
+                return NotFound("Data Empty");
         }
         [HttpDelete("delete-user-with-id")]
         public IActionResult DeleteUserwithId(int id)
@@ -68,7 +73,7 @@ namespace motel.Controllers
             var userDelete = _userRepositories.DeleteUserById(id);
             if (userDelete == null)
             {
-                return Ok("User already delete or error");
+                return Ok("User not delete or error");
             }
             else
             {

@@ -15,7 +15,9 @@ namespace motel.Models.DTO
         public string address { get; set; }
         public string password { get; set; }
         public string phone { get; set; }
+        public int roleId { get; set; }
         public string? rolename { get; set; }
+        public int tierId { get; set; }
         public string? tier { get; set; }
         public string? actualFile { get; set; }
         public string birthday { get; set; }
@@ -64,6 +66,10 @@ namespace motel.Models.DTO
         public bool gender { get; set; }
         public string? birthday { get; set; }
         public string phone { get; set; }
+        public int tierId { get; set; }
+        public int roleId { get; set; }
+        //public IFormFile? FileUri { set; get; }
+        //public string? actualFile { get; set; }
 
     }
     public class UserListResult
