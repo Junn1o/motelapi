@@ -48,7 +48,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "MyPolicy",
                       policy =>
                       {
-                          policy.WithOrigins("https://localhost:7139", "http://localhost:5088", "http://localhost:3000", "https://v3vmdvkz-3000.asse.devtunnels.ms/", "http://localhost:3001")
+                          policy.AllowAnyOrigin()
                                 .AllowAnyHeader()
                                 .AllowAnyMethod();
                       });

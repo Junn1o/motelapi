@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
 using System.Data;
 using System.Globalization;
 using System.Net;
+using System.Net.WebSockets;
 using System.Numerics;
 using System.Reflection;
 
@@ -81,31 +83,51 @@ namespace motel.Repositories
                 else
                 {
                     _dbContext.User.Remove(userDomain);
-                    _dbContext.SaveChanges();
+                    //_dbContext.SaveChanges();
                 }
             }
             return userDomain;
         }
 
-        List<UserDTO> IUserRepositories.GetAllUser()
+        UserListResult IUserRepositories.GetAllUser(int pageNumber = 1, int
+pageSize = 5)
         {
-            var allUsers = _dbContext.User.Select(User => new UserDTO()
+            var skipResults = (pageNumber - 1) * pageSize;
+
+            var query = _dbContext.User.Select(user => new UserDTO
             {
-                Id = User.Id,
-                firstname = User.firstname, 
-                lastname =User.lastname,
-                gender = User.gender ? "Nam" : "Nữ",
-                address = User.address,
-                password = User.password,
-                phone = User.phone,
-                tier = User.tiers.tiername,
-                rolename = User.role.rolename,
-                birthday = User.birthday.ToString("dd/MM/yyyy"),
-                posts = User.post.Select(post => post.Id).ToList(),
-                datecreated = User.datecreated.ToString("dd/MM/yyyy"),
-                actualFile = User.actualFile,
-            }).ToList();
-            return allUsers;
+                Id = user.Id,
+                firstname = user.firstname,
+                lastname = user.lastname,
+                gender = user.gender ? "Nam" : "Nữ",
+                address = user.address,
+                password = user.password,
+                phone = user.phone,
+                tier = user.tiers.tiername,
+                rolename = user.role.rolename,
+                birthday = user.birthday.ToString("dd/MM/yyyy"),
+                posts = user.post.Select(post => post.Id).ToList(),
+                datecreated = user.datecreated.ToString("dd/MM/yyyy"),
+                actualFile = user.actualFile,
+            });
+
+            var totalUsers = query.Count();
+            var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+
+            var users = query
+                .OrderBy(u => u.Id)
+                .Skip(skipResults)
+                .Take(pageSize)
+                .ToList();
+
+            var result = new UserListResult
+            {
+                Users = users,
+                total = totalUsers,
+                TotalPages = totalPages,
+            };
+
+            return result;
         }
 
         UserNoIdDTO IUserRepositories.GetUserById(int id)
@@ -128,7 +150,50 @@ namespace motel.Repositories
             }).FirstOrDefault();
             return UserWithIdDTO;
         }
-
+        UpdateUserBasic? IUserRepositories.UpdateUser(int id, UpdateUserBasic updateUserBasic)
+        {
+            var userDomain = _dbContext.User.FirstOrDefault(u => u.Id == id);
+            if (userDomain != null)
+            {
+                //    if (updateUserBasic.FileUri != null)
+                //    {
+                //        updateUserBasic.actualFile = UpdateImage(updateUserBasic.FileUri, userDomain.actualFile, id, userDomain.datecreated.ToString("yyyy"));
+                //        userDomain.FileUri = updateUserBasic.FileUri;
+                //        userDomain.actualFile = updateUserBasic.actualFile;
+                //    }
+                //    if (updateUserBasic.FileUri == null && userDomain.actualFile != null)
+                //    {
+                //        updateUserBasic.actualFile = userDomain.actualFile.ToString();
+                //        userDomain.actualFile = updateUserBasic.actualFile;
+                //    }
+                userDomain.firstname = updateUserBasic.firstname;
+                userDomain.lastname = updateUserBasic.lastname;
+                userDomain.address = updateUserBasic.lastname;
+                userDomain.gender = updateUserBasic.gender;
+                userDomain.birthday = DateTime.ParseExact(updateUserBasic.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                userDomain.phone = updateUserBasic.phone; 
+                if(updateUserBasic.tierId == 0)
+                {
+                    updateUserBasic.tierId = userDomain.tierId;
+                }
+                else
+                {
+                    userDomain.tierId = updateUserBasic.tierId;
+                }
+                if(updateUserBasic.roleId == 0)
+                {
+                    updateUserBasic.roleId = userDomain.roleId; 
+                }
+                else
+                {
+                    userDomain.roleId = updateUserBasic.roleId;
+                }
+                _dbContext.SaveChanges();
+                
+            }
+            
+            return updateUserBasic;
+        }
         AddUserDTO? IUserRepositories.UpdateUserById(int id, AddUserDTO user)
         {
             var userDomain = _dbContext.User.FirstOrDefault(u => u.Id == id);
