@@ -1,12 +1,13 @@
-﻿using motel.Models.Domain;
+﻿using Microsoft.AspNetCore.Mvc;
+using motel.Models.Domain;
 using motel.Models.DTO;
 
 namespace motel.Repositories
 {
     public interface IPostRepository
     {
-        List<PostDTO> GetAllPost();
-        List<PostDTO> GetAllPostAdmin();
+        PostListResult GetAllPost([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10);
+        PostListResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10);
         PostNoIdDTO GetPostByID(int id);
         AddPostDTO AddPost(AddPostDTO addpost);
         AddPostDTO UpdatePost(int id, AddPostDTO updatepost);

@@ -1,6 +1,8 @@
-﻿using motel.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace motel.Repositories
 {
@@ -11,7 +13,7 @@ namespace motel.Repositories
         {
             _appDbContext = appDbContext;
         }
-        public List<PostDTO> GetAllPost()
+        public PostListResult GetAllPost(int pageNumber = 1, int pageSize = 10)
         {
             var postlist = _appDbContext.Post.Select(p => new PostDTO()
             {
@@ -28,11 +30,22 @@ namespace motel.Repositories
                 authorid = p.userId,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
-            }).ToList();
-            return postlist;
+            });
+            var skipResults = (pageNumber - 1) * pageSize;
+            var totalPost = postlist.Count();
+            var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
+            var posts = postlist.OrderBy(p=>p.Id).Skip(skipResults).Take(pageSize).ToList();
+            var result = new PostListResult
+            {
+                Post = posts,
+                total = totalPost,
+                TotalPages = totalPages,
+            };
+            return result;
         }
-        public List<PostDTO> GetAllPostAdmin()
+        public PostListResult GetAllPostAdmin(int pageNumber = 1, int pageSize = 10)
         {
+            var skipResults = (pageNumber - 1) * pageSize;
             var postlist = _appDbContext.Post.Select(p => new PostDTO()
             {
                 Id = p.Id,
@@ -48,8 +61,20 @@ namespace motel.Repositories
                 authorid = p.userId,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
-            }).ToList();
-            return postlist;
+                categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
+            });
+            var totalPost = postlist.Count();
+            var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
+            var posts = postlist.OrderBy(p => p.Id).Skip(skipResults).Take(pageSize).ToList();
+            var result = new PostListResult
+            {
+                Post = posts,
+                total = totalPost,
+                TotalPages = totalPages,
+            };
+
+            return result;
+
         }
         public PostNoIdDTO GetPostByID(int id)
         {
@@ -157,8 +182,8 @@ namespace motel.Repositories
                     var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
                     if (categoryrpostDomain != null)
                     {
-                        //_appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
-                        //_appDbContext.SaveChanges();
+                        _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
+                        _appDbContext.SaveChanges();
                     }
                     foreach (var categoryid in updatepost.categoryids)
                     {
@@ -167,8 +192,8 @@ namespace motel.Repositories
                             postId = id,
                             categoryId = categoryid,
                         };
-                        //_appDbContext.Post_Category.Add(post_category);
-                        //_appDbContext.SaveChanges();
+                        _appDbContext.Post_Category.Add(post_category);
+                        _appDbContext.SaveChanges();
                     }
                     return updatepost;
                 }
@@ -247,8 +272,8 @@ namespace motel.Repositories
                 var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
                 if (categoryrpostDomain != null)
                 {
-                    //_appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
-                    //_appDbContext.SaveChanges();
+                    _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
+                    _appDbContext.SaveChanges();
                 }
                 foreach (var categoryid in updatepost.categoryids)
                 {
@@ -257,8 +282,8 @@ namespace motel.Repositories
                         postId = id,
                         categoryId = categoryid,
                     };
-                    //_appDbContext.Post_Category.Add(post_category);
-                    //_appDbContext.SaveChanges();
+                    _appDbContext.Post_Category.Add(post_category);
+                    _appDbContext.SaveChanges();
                 }
                 if (updatepost.adminId != null)
                 {
@@ -266,7 +291,7 @@ namespace motel.Repositories
                     postManage.userAdminId = updatepost.adminId;
                     postManage.dateapproved = updatepost.dateApprove = DateTime.Now;
                 }
-                //_appDbContext.SaveChanges();
+                _appDbContext.SaveChanges();
                 return updatepost;
             }
             else
@@ -276,6 +301,7 @@ namespace motel.Repositories
         {
             var postDomain = _appDbContext.Post.FirstOrDefault(r => r.Id == id);
             var postCategory = _appDbContext.Post_Category.Where(n => n.postId == id);
+            var postManage = _appDbContext.Post_Manage.Where(n => n.postId == id);
             if (postDomain != null)
             {
                 if (postDomain.actualFile != null)
@@ -285,6 +311,11 @@ namespace motel.Repositories
                 if (postCategory.Any())
                 {
                     _appDbContext.Post_Category.RemoveRange(postCategory);
+                    _appDbContext.SaveChanges();
+                }
+                if (postManage.Any())
+                {
+                    _appDbContext.Post_Manage.RemoveRange(postManage);
                     _appDbContext.SaveChanges();
                 }
                 _appDbContext.Post.Remove(postDomain);

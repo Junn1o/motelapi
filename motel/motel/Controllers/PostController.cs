@@ -17,9 +17,9 @@ namespace motel.Controllers
             _ipostRepository = ipostRepository;
         }
         [HttpGet("Get-all-post")]
-        public IActionResult GetAllPost()
+        public IActionResult GetAllPost([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var postlist = _ipostRepository.GetAllPost();
+            var postlist = _ipostRepository.GetAllPost(pageNumber, pageSize);
             if (postlist != null)
             {
                 return Ok(postlist);
@@ -28,9 +28,9 @@ namespace motel.Controllers
                 return NotFound("Data Empty");
         }
         [HttpGet("Get-all-post-admin")]
-        public IActionResult GetAllPostAdmin()
+        public IActionResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var postlist = _ipostRepository.GetAllPostAdmin();
+            var postlist = _ipostRepository.GetAllPostAdmin(pageNumber, pageSize);
             if (postlist != null)
             {
                 return Ok(postlist);
@@ -99,7 +99,7 @@ namespace motel.Controllers
             }
             else
             {
-                return Ok("author deleted");
+                return Ok("Room deleted");
             }
         }
     }

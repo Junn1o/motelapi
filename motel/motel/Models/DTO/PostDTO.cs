@@ -20,6 +20,7 @@ namespace motel.Models.DTO
         public string FormattedDatecreated { get; set; }
         public string FormattedDateapprove { get; set; }
         public List<string> categorylist { get; set; }
+        public List<int> categoryids { get; set; }
     }
     public class PostNoIdDTO
     {
@@ -78,5 +79,11 @@ namespace motel.Models.DTO
         public List<int>? categoryids { get; set; }
         public DateTime? dateApprove { get; set; }
         public DateTime? dateCreated { get; set; }
+    }
+    public class PostListResult
+    {
+        public List<PostDTO> Post {  get; set; }
+        public int total { get; set; }
+        public int TotalPages { get; set; }
     }
 }
