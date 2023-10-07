@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
@@ -82,7 +83,7 @@ namespace motel.Repositories
                 else
                 {
                     _dbContext.User.Remove(userDomain);
-                    _dbContext.SaveChanges();
+                    //_dbContext.SaveChanges();
                 }
             }
             return userDomain;
@@ -154,15 +155,43 @@ pageSize = 5)
             var userDomain = _dbContext.User.FirstOrDefault(u => u.Id == id);
             if (userDomain != null)
             {
+                //    if (updateUserBasic.FileUri != null)
+                //    {
+                //        updateUserBasic.actualFile = UpdateImage(updateUserBasic.FileUri, userDomain.actualFile, id, userDomain.datecreated.ToString("yyyy"));
+                //        userDomain.FileUri = updateUserBasic.FileUri;
+                //        userDomain.actualFile = updateUserBasic.actualFile;
+                //    }
+                //    if (updateUserBasic.FileUri == null && userDomain.actualFile != null)
+                //    {
+                //        updateUserBasic.actualFile = userDomain.actualFile.ToString();
+                //        userDomain.actualFile = updateUserBasic.actualFile;
+                //    }
                 userDomain.firstname = updateUserBasic.firstname;
                 userDomain.lastname = updateUserBasic.lastname;
                 userDomain.address = updateUserBasic.lastname;
                 userDomain.gender = updateUserBasic.gender;
                 userDomain.birthday = DateTime.ParseExact(updateUserBasic.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                userDomain.phone = updateUserBasic.phone;
+                userDomain.phone = updateUserBasic.phone; 
+                if(updateUserBasic.tierId == 0)
+                {
+                    updateUserBasic.tierId = userDomain.tierId;
+                }
+                else
+                {
+                    userDomain.tierId = updateUserBasic.tierId;
+                }
+                if(updateUserBasic.roleId == 0)
+                {
+                    updateUserBasic.roleId = userDomain.roleId; 
+                }
+                else
+                {
+                    userDomain.roleId = updateUserBasic.roleId;
+                }
                 _dbContext.SaveChanges();
-
+                
             }
+            
             return updateUserBasic;
         }
         AddUserDTO? IUserRepositories.UpdateUserById(int id, AddUserDTO user)
