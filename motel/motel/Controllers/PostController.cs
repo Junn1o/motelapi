@@ -17,9 +17,20 @@ namespace motel.Controllers
             _ipostRepository = ipostRepository;
         }
         [HttpGet("Get-all-post")]
-        public IActionResult GetAllPost()
+        public IActionResult GetAllPost([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var postlist = _ipostRepository.GetAllPost();
+            var postlist = _ipostRepository.GetAllPost(pageNumber, pageSize);
+            if (postlist != null)
+            {
+                return Ok(postlist);
+            }
+            else
+                return NotFound("Data Empty");
+        }
+        [HttpGet("Get-all-post-admin")]
+        public IActionResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var postlist = _ipostRepository.GetAllPostAdmin(pageNumber, pageSize);
             if (postlist != null)
             {
                 return Ok(postlist);
@@ -50,11 +61,33 @@ namespace motel.Controllers
             var postUpdate = _ipostRepository.UpdatePost(id, updatepost);
             return Ok(postUpdate);
         }
+        [HttpPut("update-basic")]
+        public IActionResult UpdatePostM( int id ,[FromBody] UpdatePostManage updatePostBasic)
+        {
+            var postUpdate = _ipostRepository.UpdatePostM(id, updatePostBasic);
+            if (postUpdate != null)
+            {
+                return Ok(postUpdate);
+            }
+            else
+            {
+                return StatusCode(10000);
+            }
+
+        }
         [HttpPut("update-post-manage")]
         public IActionResult UpdatePostManage(int id, [FromForm] UpdatePost_Manage updatepost)
         {
             var postUpdate = _ipostRepository.UpdatePostManage(id, updatepost);
-            return Ok(postUpdate);
+            if (postUpdate != null)
+            {
+                return Ok(postUpdate);
+            }
+            else
+            {
+                return StatusCode(10000);
+            }
+
         }
         [HttpDelete("delete-post-with-id")]
         public IActionResult DeletePostwithId(int id)
@@ -66,7 +99,7 @@ namespace motel.Controllers
             }
             else
             {
-                return Ok("author deleted");
+                return Ok("Room deleted");
             }
         }
     }
