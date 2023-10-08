@@ -78,4 +78,24 @@ namespace motel.Models.DTO
         public int total { get; set; }
         public int TotalPages { get; set; }
     }
+
+    public class UserRoleDTO
+    {
+        public int Id { get; set; }
+        public string fullname { get; set; }
+        public string rolename { get; set; }
+        public string phone { get; set; }
+        public int roleId { get; set; }
+    }
+    public class UserRoleResult
+    {
+        public List<UserRoleDTO> Users { get; set; }
+        public int total { get; set; }
+        public int TotalPages { get; set; }
+    }
+    public class EditUserRoleDTO
+    {
+        public List<int> userids { get; set; }
+        public int roleids { get; set; }
+    }
 }
