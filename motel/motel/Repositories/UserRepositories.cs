@@ -108,7 +108,7 @@ pageSize = 5)
                 roleId = user.roleId,
                 rolename = user.role.rolename,
                 birthday = user.birthday.ToString("dd/MM/yyyy"),
-                posts = user.post.Select(post => post.Id).ToList(),
+                posts = user.post.ToList(),
                 datecreated = user.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = user.actualFile,
             });
@@ -145,7 +145,7 @@ pageSize = 5)
                 phone = User.phone,
                 tier = User.tiers.tiername,
                 rolename = User.role.rolename,
-                posts = User.post.Select(post => post.Id).ToList(),
+                posts = User.post.ToList(),
                 birthday = User.birthday.ToString("dd/MM/yyyy"),
                 datecreated = User.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = User.actualFile,
