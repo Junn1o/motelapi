@@ -83,7 +83,7 @@ namespace motel.Repositories
                 else
                 {
                     _dbContext.User.Remove(userDomain);
-                    //_dbContext.SaveChanges();
+                    _dbContext.SaveChanges();
                 }
             }
             return userDomain;
