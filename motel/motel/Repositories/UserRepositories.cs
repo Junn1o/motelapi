@@ -83,7 +83,7 @@ namespace motel.Repositories
                 else
                 {
                     _dbContext.User.Remove(userDomain);
-                    //_dbContext.SaveChanges();
+                    _dbContext.SaveChanges();
                 }
             }
             return userDomain;
@@ -103,7 +103,9 @@ pageSize = 5)
                 address = user.address,
                 password = user.password,
                 phone = user.phone,
+                tierId = user.tierId,
                 tier = user.tiers.tiername,
+                roleId = user.roleId,
                 rolename = user.role.rolename,
                 birthday = user.birthday.ToString("dd/MM/yyyy"),
                 posts = user.post.Select(post => post.Id).ToList(),
