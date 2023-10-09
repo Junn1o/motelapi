@@ -8,6 +8,7 @@ namespace motel.Repositories
     {
         PostListResult GetAllPost([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10);
         PostListResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10);
+        ApprovePost approvePost(int id, ApprovePost aprovePost);
         PostNoIdDTO GetPostByID(int id);
         AddPostDTO AddPost(AddPostDTO addpost);
         AddPostDTO UpdatePost(int id, AddPostDTO updatepost);

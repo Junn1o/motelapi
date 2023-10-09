@@ -87,7 +87,19 @@ namespace motel.Controllers
             {
                 return StatusCode(10000);
             }
-
+        }
+        [HttpPut("approve-post")]
+        public IActionResult approvePost(int id, [FromForm] ApprovePost approvePost)
+        {
+            var postUpdate = _ipostRepository.approvePost(id, approvePost);
+            if (postUpdate != null)
+            {
+                return Ok(postUpdate);
+            }
+            else
+            {
+                return StatusCode(10000);
+            }
         }
         [HttpDelete("delete-post-with-id")]
         public IActionResult DeletePostwithId(int id)

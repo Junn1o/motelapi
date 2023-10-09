@@ -107,7 +107,7 @@ namespace motel.Repositories
                     address = addpost.address,
                     description = addpost.description,
                     userId = (int)addpost.userId,
-                    status = addpost.status = "Đang chờ duyệt",
+                    status = addpost.status = "Đang Chờ Duyệt",
                     isHire = (bool)(addpost.isHire = false),
                     area = addpost.area,
                     datecreatedroom = (DateTime)(addpost.dateCreated = DateTime.Now),
@@ -225,8 +225,8 @@ namespace motel.Repositories
                 var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
                 if (categoryrpostDomain != null)
                 {
-                    //_appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
-                    //_appDbContext.SaveChanges();
+                    _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
+                    _appDbContext.SaveChanges();
                 }
                 foreach (var categoryid in updatepost.categoryids)
                 {
@@ -235,20 +235,43 @@ namespace motel.Repositories
                         postId = id,
                         categoryId = categoryid,
                     };
-                    //_appDbContext.Post_Category.Add(post_category);
-                    //_appDbContext.SaveChanges();
+                    _appDbContext.Post_Category.Add(post_category);
+                    _appDbContext.SaveChanges();
                 }
-                if (updatepost.adminId != null)
-                {
-                    var postManage = _appDbContext.Post_Manage.FirstOrDefault(pm => pm.postId == id);
-                    postManage.userAdminId = updatepost.adminId;
-                    postManage.dateapproved = updatepost.dateApprove = DateTime.Now;
-                }
-                //_appDbContext.SaveChanges();
+
+                _appDbContext.SaveChanges();
                 return updatepost;
             }
             else
                 return null;
+        }
+        public ApprovePost approvePost(int id, ApprovePost approvePost)
+        {
+            var postDomain = _appDbContext.Post.FirstOrDefault(r => r.Id == id);
+            if (postDomain != null)
+            {
+                // Đang Chờ Duyệt,Không Chấp Nhận Duyệt, Đã Duyệt, Đã Ẩn
+                var postManage = _appDbContext.Post_Manage.FirstOrDefault(pm => pm.postId == id);
+                if (approvePost.status == "Từ Chối Được Duyệt")
+                {
+                    postManage.reason = approvePost.reason;
+                    postDomain.status = approvePost.status;
+                }
+                if (approvePost.status == "Đã Duyệt")
+                {
+                    postManage.userAdminId = approvePost.adminId;
+                    postManage.dateapproved = approvePost.dateApproved = DateTime.Now;
+                    postDomain.status = approvePost.status;
+                }
+                if (approvePost.status == "Đã Ẩn")
+                {
+                    postDomain.status = approvePost.status;
+                }
+                //else
+                //    throw new Exception(approvePost.status.ToString());
+                _appDbContext.SaveChanges();
+            }
+            return approvePost;
         }
         public UpdatePost_Manage UpdatePostManage(int id, UpdatePost_Manage updatepost)
         {

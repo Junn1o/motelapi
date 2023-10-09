@@ -10,6 +10,7 @@ namespace motel.Models.Domain
         public int? userAdminId { get; set; }
         public User user { get; set; }
         //public bool isApprove { get; set; }
+        public string? reason {  get; set; }
         public DateTime? dateapproved { get; set; }
     }
 }

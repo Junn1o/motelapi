@@ -96,6 +96,6 @@ namespace motel.Models.DTO
     public class EditUserRoleDTO
     {
         public List<int> userids { get; set; }
-        public int roleids { get; set; }
+        public int roleid { get; set; }
     }
 }

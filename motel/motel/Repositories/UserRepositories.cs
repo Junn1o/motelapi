@@ -166,7 +166,7 @@ pageSize = 5)
                 var UserDomain = _dbContext.User.FirstOrDefault(n => n.Id == userIds);
                 if (UserDomain!=null)
                 {
-                    UserDomain.roleId = editroleDTO.roleids;
+                    UserDomain.roleId = editroleDTO.roleid;
                     _dbContext.SaveChanges();
                 }
             }
