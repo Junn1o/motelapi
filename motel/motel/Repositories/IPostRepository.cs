@@ -8,12 +8,11 @@ namespace motel.Repositories
     {
         PostListResult GetAllPost([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10);
         PostListResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10);
-        ApprovePost approvePost(int id, ApprovePost aprovePost);
         PostNoIdDTO GetPostByID(int id);
         AddPostDTO AddPost(AddPostDTO addpost);
         AddPostDTO UpdatePost(int id, AddPostDTO updatepost);
-        UpdatePost_Manage UpdatePostManage(int id, UpdatePost_Manage updatePost_Manage);
         Post DeletePost(int id);
-        UpdatePostManage UpdatePostM(int id, UpdatePostManage updatePostBasic);
+        UpdatePostManage UpdatePostM(int id, UpdatePostManage updatepost);
+        Post_Approve post_Approve(int id, Post_Approve post_Approve);
     }
 }

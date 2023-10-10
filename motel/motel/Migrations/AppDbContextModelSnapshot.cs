@@ -36,7 +36,7 @@ namespace motel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Post", b =>
@@ -86,7 +86,7 @@ namespace motel.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("Post");
+                    b.ToTable("Post", (string)null);
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Post_Category", b =>
@@ -109,7 +109,7 @@ namespace motel.Migrations
 
                     b.HasIndex("postId");
 
-                    b.ToTable("Post_Category");
+                    b.ToTable("Post_Category", (string)null);
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Post_Manage", b =>
@@ -138,7 +138,7 @@ namespace motel.Migrations
 
                     b.HasIndex("userAdminId");
 
-                    b.ToTable("Post_Manage");
+                    b.ToTable("Post_Manage", (string)null);
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Role", b =>
@@ -155,7 +155,7 @@ namespace motel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role", (string)null);
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Tiers", b =>
@@ -172,7 +172,7 @@ namespace motel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tiers");
+                    b.ToTable("Tiers", (string)null);
                 });
 
             modelBuilder.Entity("motel.Models.Domain.User", b =>
@@ -227,7 +227,7 @@ namespace motel.Migrations
 
                     b.HasIndex("tierId");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Post", b =>

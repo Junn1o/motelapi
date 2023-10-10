@@ -52,20 +52,6 @@ namespace motel.Models.DTO
         public DateTime? dateCreated { get; set; }
         public List<int> categoryids { get; set; }
     }
-    public class UpdatePost_Manage
-    {
-        public string title { get; set; }
-        public string description { get; set; }
-        public string address { get; set; }
-        public int adminId { get; set; }
-        public decimal price { get; set; }
-        public int area { get; set; }
-        public string status { get; set; }
-        public string? isHire { get; set; }
-        public List<int>? categoryids { get; set; }
-        public DateTime? dateApprove { get; set; }
-        public DateTime? dateCreated { get; set; }
-    }
     public class UpdatePostManage
     {
         public string title { get; set; }
@@ -78,17 +64,17 @@ namespace motel.Models.DTO
         public List<int>? categoryids { get; set; }
         public DateTime? dateCreated { get; set; }
     }
-    public class ApprovePost
-    {
-        public int adminId { get; set; }
-        public string? status { get; set; }
-        public string? reason { get; set; }
-        public DateTime? dateApproved { get; set; }
-    }
     public class PostListResult
     {
         public List<PostDTO> Post {  get; set; }
         public int total { get; set; }
         public int TotalPages { get; set; }
+    }
+    public class Post_Approve
+    {
+        public int userAdminId { get; set; }
+        public string status { get; set; }
+        public string? reason { get; set; }
+        public DateTime? dateApproved { get; set; }
     }
 }
