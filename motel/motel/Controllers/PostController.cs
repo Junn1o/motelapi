@@ -62,7 +62,7 @@ namespace motel.Controllers
             return Ok(postUpdate);
         }
         [HttpPut("update-basic")]
-        public IActionResult UpdatePostM( int id ,[FromBody] UpdatePostManage updatePostBasic)
+        public IActionResult UpdatePostM(int id ,[FromBody] UpdatePostManage updatePostBasic)
         {
             var postUpdate = _ipostRepository.UpdatePostM(id, updatePostBasic);
             if (postUpdate != null)
@@ -75,20 +75,32 @@ namespace motel.Controllers
             }
 
         }
-        [HttpPut("update-post-manage")]
-        public IActionResult UpdatePostManage(int id, [FromForm] UpdatePost_Manage updatepost)
+        [HttpPut("post-approve")]
+        public IActionResult post_Approve(int id, [FromBody] Post_Approve post_Approve)
         {
-            var postUpdate = _ipostRepository.UpdatePostManage(id, updatepost);
-            if (postUpdate != null)
+            var postPost = _ipostRepository.post_Approve(id, post_Approve);
+            if (postPost != null)
             {
-                return Ok(postUpdate);
+                return Ok(postPost);
             }
             else
             {
                 return StatusCode(10000);
             }
-
         }
+        //[HttpPut("update-post-manage")]
+        //public IActionResult UpdatePostManage(int id, [FromForm] UpdatePost_Manage updatepost)
+        //{
+        //    var postUpdate = _ipostRepository.UpdatePostManage(id, updatepost);
+        //    if (postUpdate != null)
+        //    {
+        //        return Ok(postUpdate);
+        //    }
+        //    else
+        //    {
+        //        return StatusCode(10000);
+        //    }
+        //}
         [HttpDelete("delete-post-with-id")]
         public IActionResult DeletePostwithId(int id)
         {

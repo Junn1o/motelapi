@@ -33,6 +33,14 @@ namespace motel.Controllers
             return Ok(allUsers);
             
         }
+        [HttpGet("get-role-users")]
+        public IActionResult GetAllUserRole([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            // su dung reposity pattern 
+            var allUsers = _userRepositories.GetAllUserRole(pageNumber, pageSize);
+            return Ok(allUsers);
+
+        }
         [HttpPost("add-user")]
         public IActionResult AddUser([FromForm] AddUserDTO addUserDTO)
         {
@@ -60,6 +68,17 @@ namespace motel.Controllers
         public IActionResult UpdateUserBasic(int id, UpdateUserBasic updateUserBasic)
         {
             var user = _userRepositories.UpdateUser(id , updateUserBasic);
+            if (user != null)
+            {
+                return Ok(user);
+            }
+            else
+                return NotFound("Data Empty");
+        }
+        [HttpPut("update-role-user")]
+        public IActionResult EditUserRole(EditUserRoleDTO updateRole)
+        {
+            var user = _userRepositories.EditUserRole(updateRole);
             if (user != null)
             {
                 return Ok(user);

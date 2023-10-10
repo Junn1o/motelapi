@@ -9,13 +9,15 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Numerics;
 using System.Reflection;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace motel.Repositories
 {
     public class UserRepositories : IUserRepositories
     {
         private readonly AppDbContext _dbContext;
-        public UserRepositories(AppDbContext context) {
+        public UserRepositories(AppDbContext context)
+        {
             _dbContext = context;
         }
         AddUserDTO IUserRepositories.AddUser(AddUserDTO addUser)
@@ -43,7 +45,7 @@ namespace motel.Repositories
             else
             {
                 var defaultimage = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "user", "noavt.png");
-                var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot", "images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"));
+                var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"));
                 Directory.CreateDirectory(uploadFolderPath);
                 var filePath = Path.Combine(uploadFolderPath, "avatar.png");
                 File.Copy(defaultimage, filePath, true);
@@ -54,7 +56,6 @@ namespace motel.Repositories
             return addUser;
 
         }
-
         User? IUserRepositories.DeleteUserById(int id)
         {
             var userDomain = _dbContext.User.FirstOrDefault(c => c.Id == id);
@@ -62,7 +63,7 @@ namespace motel.Repositories
             var userManager = _dbContext.Post_Manage.Where(um => um.postId == id).ToList();
             if (userDomain != null)
             {
-                
+
                 if (userPost.Any())
                 {
                     foreach (var post in userPost)
@@ -131,10 +132,50 @@ pageSize = 5)
 
             return result;
         }
+        public UserRoleResult GetAllUserRole(int pageNumber = 1, int pageSize = 10)
+        {
+            var skipResults = (pageNumber - 1) * pageSize;
+            var query = _dbContext.User.Select(u => new UserRoleDTO
+            {
+                Id = u.Id,
+                fullname = u.firstname + " " + u.lastname,
+                phone = u.phone,
+                rolename = u.role.rolename,
+                roleId = u.roleId,
+            });
+            var totalUsers = query.Count();
+            var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+
+            var users = query
+                .OrderBy(u => u.Id)
+                .Skip(skipResults)
+                .Take(pageSize)
+                .ToList();
+            var result = new UserRoleResult
+            {
+                Users = users,
+                total = totalUsers,
+                TotalPages = totalPages,
+            };
+            return result;
+        }
+        public EditUserRoleDTO EditUserRole(EditUserRoleDTO editroleDTO)
+        {
+            foreach (int userIds in editroleDTO.userids)
+            {
+                var UserDomain = _dbContext.User.FirstOrDefault(n => n.Id == userIds);
+                if (UserDomain!=null)
+                {
+                    UserDomain.roleId = editroleDTO.roleid;
+                    _dbContext.SaveChanges();
+                }
+            }
+            return editroleDTO;
+        }
 
         UserNoIdDTO IUserRepositories.GetUserById(int id)
         {
-            
+
             var UserbyDomain = _dbContext.User.Where(n => n.Id == id);
             var UserWithIdDTO = UserbyDomain.Select(User => new UserNoIdDTO()
             {
@@ -173,8 +214,8 @@ pageSize = 5)
                 userDomain.address = updateUserBasic.lastname;
                 userDomain.gender = updateUserBasic.gender;
                 userDomain.birthday = DateTime.ParseExact(updateUserBasic.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                userDomain.phone = updateUserBasic.phone; 
-                if(updateUserBasic.tierId == 0)
+                userDomain.phone = updateUserBasic.phone;
+                if (updateUserBasic.tierId == 0)
                 {
                     updateUserBasic.tierId = userDomain.tierId;
                 }
@@ -182,18 +223,18 @@ pageSize = 5)
                 {
                     userDomain.tierId = updateUserBasic.tierId;
                 }
-                if(updateUserBasic.roleId == 0)
+                if (updateUserBasic.roleId == 0)
                 {
-                    updateUserBasic.roleId = userDomain.roleId; 
+                    updateUserBasic.roleId = userDomain.roleId;
                 }
                 else
                 {
                     userDomain.roleId = updateUserBasic.roleId;
                 }
                 _dbContext.SaveChanges();
-                
+
             }
-            
+
             return updateUserBasic;
         }
         AddUserDTO? IUserRepositories.UpdateUserById(int id, AddUserDTO user)
@@ -207,7 +248,7 @@ pageSize = 5)
                     userDomain.FileUri = user.FileUri;
                     userDomain.actualFile = user.actualFile;
                 }
-                if (user.FileUri == null && userDomain.actualFile !=null)
+                if (user.FileUri == null && userDomain.actualFile != null)
                 {
                     user.actualFile = userDomain.actualFile.ToString();
                     userDomain.actualFile = user.actualFile;

@@ -107,7 +107,7 @@ namespace motel.Repositories
                     address = addpost.address,
                     description = addpost.description,
                     userId = (int)addpost.userId,
-                    status = addpost.status = "Đang chờ duyệt",
+                    status = addpost.status = "Đang Chờ Duyệt",
                     isHire = (bool)(addpost.isHire = false),
                     area = addpost.area,
                     datecreatedroom = (DateTime)(addpost.dateCreated = DateTime.Now),
@@ -225,53 +225,6 @@ namespace motel.Repositories
                 var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
                 if (categoryrpostDomain != null)
                 {
-                    //_appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
-                    //_appDbContext.SaveChanges();
-                }
-                foreach (var categoryid in updatepost.categoryids)
-                {
-                    var post_category = new Post_Category()
-                    {
-                        postId = id,
-                        categoryId = categoryid,
-                    };
-                    //_appDbContext.Post_Category.Add(post_category);
-                    //_appDbContext.SaveChanges();
-                }
-                if (updatepost.adminId != null)
-                {
-                    var postManage = _appDbContext.Post_Manage.FirstOrDefault(pm => pm.postId == id);
-                    postManage.userAdminId = updatepost.adminId;
-                    postManage.dateapproved = updatepost.dateApprove = DateTime.Now;
-                }
-                //_appDbContext.SaveChanges();
-                return updatepost;
-            }
-            else
-                return null;
-        }
-        public UpdatePost_Manage UpdatePostManage(int id, UpdatePost_Manage updatepost)
-        {
-            var postDomain = _appDbContext.Post.FirstOrDefault(r => r.Id == id);
-            if (postDomain != null)
-            {
-                postDomain.title = updatepost.title;
-                postDomain.description = updatepost.description;
-                postDomain.address = updatepost.address;
-                postDomain.price = updatepost.price;
-                postDomain.status = updatepost.status;
-                postDomain.area = updatepost.area;
-                if (updatepost.isHire == "Chưa Được Thuê")
-                {
-                    postDomain.isHire = false;
-                }
-                else
-                {
-                    postDomain.isHire = true;
-                }
-                var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
-                if (categoryrpostDomain != null)
-                {
                     _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
                     _appDbContext.SaveChanges();
                 }
@@ -285,17 +238,37 @@ namespace motel.Repositories
                     _appDbContext.Post_Category.Add(post_category);
                     _appDbContext.SaveChanges();
                 }
-                if (updatepost.adminId != null)
-                {
-                    var postManage = _appDbContext.Post_Manage.FirstOrDefault(pm => pm.postId == id);
-                    postManage.userAdminId = updatepost.adminId;
-                    postManage.dateapproved = updatepost.dateApprove = DateTime.Now;
-                }
                 _appDbContext.SaveChanges();
                 return updatepost;
             }
             else
                 return null;
+        }
+        public Post_Approve post_Approve(int id, Post_Approve post_Approve)
+        {
+            var postDomain = _appDbContext.Post.FirstOrDefault(r => r.Id == id);
+            if (postDomain != null)
+            {
+                // Đang Chờ Duyệt,Không Chấp Nhận Duyệt, Đã Duyệt, Đã Ẩn
+                var postManage = _appDbContext.Post_Manage.FirstOrDefault(pm => pm.postId == id);
+                if (post_Approve.status.ToString() == "Từ Chối Được Duyệt")
+                {
+                    postManage.reason = post_Approve.reason;
+                    postDomain.status = post_Approve.status;
+                }
+                if (post_Approve.status.ToString() == "Đã Duyệt")
+                {
+                    postManage.userAdminId = post_Approve.userAdminId;
+                    postManage.dateapproved = post_Approve.dateApproved = DateTime.Now;
+                    postDomain.status = post_Approve.status;
+                }
+                if (post_Approve.status.ToString() == "Đã Ẩn")
+                {
+                    postDomain.status = post_Approve.status;
+                }
+                _appDbContext.SaveChanges();
+            }
+            return post_Approve;
         }
         public Post DeletePost(int id)
         {
