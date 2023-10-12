@@ -36,6 +36,8 @@ namespace motel.Repositories
                 //tierId = addUser.tierId = 1,
                 FileUri = addUser.FileUri,
             };
+            _dbContext.User.Add(userDomain);
+            _dbContext.SaveChanges();
             if (addUser.FileUri != null)
             {
                 addUser.actualFile = UploadImage(addUser.FileUri, userDomain.Id, addUser.datecreated.ToString("yyyy"));
@@ -50,7 +52,6 @@ namespace motel.Repositories
                 addUser.actualFile = Path.Combine("images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"), "avatar.png");
             }
             userDomain.actualFile = addUser.actualFile;
-            _dbContext.User.Add(userDomain);
             _dbContext.SaveChanges();
             var usertier = new Tier_User()
             {
