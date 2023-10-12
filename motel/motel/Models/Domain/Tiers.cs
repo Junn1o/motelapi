@@ -7,6 +7,7 @@ namespace motel.Models.Domain
         [Key]
         public int Id { get; set; }
         public string tiername { get; set; }
-        public List<User> user { get; set; }
+        public decimal price { get; set; }
+        public List<Tier_User> tier_user { get; set; }
     }
 }

@@ -33,9 +33,15 @@ namespace motel.Repositories
                 password = addUser.password,
                 phone = addUser.phone,
                 roleId = addUser.roleId,
-                tierId = addUser.tierId = 1,
-                FileUri = addUser.FileUri
+                //tierId = addUser.tierId = 1,
+                FileUri = addUser.FileUri,
             };
+            var usertier = new Tier_User()
+            {
+                tierId = addUser.tierId = 1,
+                userId = userDomain.Id,
+            };
+            _dbContext.Tier_User.Add(usertier);
             _dbContext.User.Add(userDomain);
             _dbContext.SaveChanges();
             if (addUser.FileUri != null)
@@ -104,8 +110,8 @@ pageSize = 5)
                 address = user.address,
                 password = user.password,
                 phone = user.phone,
-                tierId = user.tierId,
-                tier = user.tiers.tiername,
+                tierId = user.users_tier.tierId,
+                tier = user.users_tier.tiers.tiername,
                 roleId = user.roleId,
                 rolename = user.role.rolename,
                 birthday = user.birthday.ToString("dd/MM/yyyy"),
@@ -184,7 +190,7 @@ pageSize = 5)
                 address = User.address,
                 password = User.password,
                 phone = User.phone,
-                tier = User.tiers.tiername,
+                tier = User.users_tier.tiers.tiername,
                 rolename = User.role.rolename,
                 posts = User.post.ToList(),
                 birthday = User.birthday.ToString("dd/MM/yyyy"),
@@ -215,13 +221,14 @@ pageSize = 5)
                 userDomain.gender = updateUserBasic.gender;
                 userDomain.birthday = DateTime.ParseExact(updateUserBasic.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 userDomain.phone = updateUserBasic.phone;
-                if (updateUserBasic.tierId == 0)
+                var tierDomain = _dbContext.Tier_User.FirstOrDefault(u => u.userId == id);
+                if (updateUserBasic.tierId == 0 && tierDomain!=null)
                 {
-                    updateUserBasic.tierId = userDomain.tierId;
+                    updateUserBasic.tierId = tierDomain.tierId;
                 }
                 else
                 {
-                    userDomain.tierId = updateUserBasic.tierId;
+                    tierDomain.tierId = updateUserBasic.tierId;
                 }
                 if (updateUserBasic.roleId == 0)
                 {
@@ -259,7 +266,7 @@ pageSize = 5)
                 userDomain.address = user.address;
                 userDomain.password = user.password;
                 userDomain.phone = user.phone;
-                userDomain.tierId = user.tierId;
+                //userDomain.tierId = user.tierId;
                 userDomain.roleId = user.roleId;
                 userDomain.birthday = DateTime.ParseExact(user.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 _dbContext.SaveChanges();

@@ -72,9 +72,7 @@ namespace motel.Repositories
                 total = totalPost,
                 TotalPages = totalPages,
             };
-
             return result;
-
         }
         public PostNoIdDTO GetPostByID(int id)
         {
@@ -91,6 +89,7 @@ namespace motel.Repositories
                 isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
                 status = p.status,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
+                //FormattedDateapprove = p.post_manage.FirstOrDefault(pm=>pm.dateapproved.ToString("dd/MM/yyyy")),
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
             }).FirstOrDefault();
             return getPostDTO;

@@ -82,7 +82,7 @@ namespace motel.Controllers
             new Claim(ClaimTypes.Surname, user.lastname),    // Sử dụng Surname thay vì Name cho họ
             new Claim(ClaimTypes.Gender, user.gender ? "Nam" : "Nữ"),
             new Claim(ClaimTypes.Role, user.roleId.ToString()),
-            new Claim(ClaimTypes.UserData, user.tierId.ToString()), // Sử dụng UserData cho thông tin người dùng khác
+            new Claim(ClaimTypes.UserData, user.users_tier.tiers.tiername.ToString()), // Sử dụng UserData cho thông tin người dùng khác
             new Claim(ClaimTypes.StreetAddress, user.address), // Sử dụng StreetAddress cho địa chỉ
             new Claim(ClaimTypes.DateOfBirth, user.birthday.ToString("yyyy-MM-dd")), // Sử dụng DateOfBirth cho ngày sinh, và định dạng ISO 8601
             new Claim("profilePicture", user.actualFile),
