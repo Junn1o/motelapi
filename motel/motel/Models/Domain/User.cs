@@ -12,8 +12,7 @@ namespace motel.Models.Domain
         public string address { get; set; }
         public string password { get; set; }
         public string phone { get; set; }
-        public Tiers tiers { get; set; }
-        public int tierId { get; set; }
+        public Tier_User users_tier { get; set; }
         public Role role { get; set; }
         public int roleId { get; set; }
         public List<Post_Manage> post_manage { get; set; }   

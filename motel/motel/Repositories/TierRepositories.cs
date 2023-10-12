@@ -41,7 +41,7 @@ namespace motel.Repositories
             {
                 Id = Tiers.Id,
                 tiername = Tiers.tiername,
-                Users = Tiers.user.Select(n => n.firstname + " " + n.lastname).ToList()
+                Users = Tiers.tier_user.Select(n => n.user.firstname + " " + n.user.lastname).ToList()
             }).ToList();
             return allTiers;
         }
@@ -51,7 +51,7 @@ namespace motel.Repositories
             var TierWithDomain = _dbContext.Tiers.Where(n => n.Id == id);
             var TierWithIdDTO = TierWithDomain.Select(Tier => new TiersNoIdDTO(){
                 tiername = Tier.tiername,
-                Users = Tier.user.Select(n => n.firstname + " " + n.lastname).ToList()
+                Users = Tier.tier_user.Select(n => n.user.firstname + " " + n.user.lastname).ToList()
             }).FirstOrDefault();
             return TierWithIdDTO;
         }
