@@ -36,14 +36,6 @@ namespace motel.Repositories
                 //tierId = addUser.tierId = 1,
                 FileUri = addUser.FileUri,
             };
-            var usertier = new Tier_User()
-            {
-                tierId = addUser.tierId = 1,
-                userId = userDomain.Id,
-            };
-            _dbContext.Tier_User.Add(usertier);
-            _dbContext.User.Add(userDomain);
-            _dbContext.SaveChanges();
             if (addUser.FileUri != null)
             {
                 addUser.actualFile = UploadImage(addUser.FileUri, userDomain.Id, addUser.datecreated.ToString("yyyy"));
@@ -58,6 +50,14 @@ namespace motel.Repositories
                 addUser.actualFile = Path.Combine("images", "user", userDomain.Id + "-" + userDomain.datecreated.ToString("yyyy"), "avatar.png");
             }
             userDomain.actualFile = addUser.actualFile;
+            _dbContext.User.Add(userDomain);
+            _dbContext.SaveChanges();
+            var usertier = new Tier_User()
+            {
+                tierId = addUser.tierId = 1,
+                userId = userDomain.Id,
+            };
+            _dbContext.Tier_User.Add(usertier);
             _dbContext.SaveChanges();
             return addUser;
 
@@ -67,6 +67,7 @@ namespace motel.Repositories
             var userDomain = _dbContext.User.FirstOrDefault(c => c.Id == id);
             var userPost = _dbContext.Post.Where(up => up.userId == id).ToList();
             var userManager = _dbContext.Post_Manage.Where(um => um.postId == id).ToList();
+            var tierDomain = _dbContext.Tier_User.FirstOrDefault(u => u.userId == id);
             if (userDomain != null)
             {
 
@@ -82,6 +83,7 @@ namespace motel.Repositories
                         }
                     }
                     DeleteImage(userDomain.actualFile);
+                    _dbContext.Tier_User.Remove(tierDomain);
                     _dbContext.Post.RemoveRange(userPost);
                     _dbContext.SaveChanges();
                     _dbContext.User.Remove(userDomain);

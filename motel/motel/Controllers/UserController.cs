@@ -45,7 +45,7 @@ namespace motel.Controllers
         public IActionResult AddUser([FromForm] AddUserDTO addUserDTO)
         {
             var userAdd = _userRepositories.AddUser(addUserDTO);
-            return Ok();
+            return Ok(userAdd);
         }
         [HttpGet("get-user-with-id")]
         public IActionResult GetUserwithId(int id)
