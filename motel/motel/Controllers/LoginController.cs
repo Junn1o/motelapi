@@ -20,11 +20,13 @@ namespace motel.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
+        private readonly AppDbContext _dbContext;
         private readonly IConfiguration _configuration;
         private readonly IUserRepositories _userRepository;
 
-        public LoginController(IConfiguration configuration, IUserRepositories userRepository)
+        public LoginController(IConfiguration configuration, IUserRepositories userRepository,AppDbContext dbContext )
         {
+            _dbContext = dbContext;
             _configuration = configuration;
             _userRepository = userRepository;
         }
@@ -75,6 +77,10 @@ namespace motel.Controllers
 
         private string GenerateJwtToken(User user)
         {
+            var userTier = _dbContext.Tier_User
+                            .Include(tu => tu.tiers) // Đảm bảo bạn đã sử dụng Include để nạp thông tin tiers
+                            .Where(tu => tu.userId == user.Id)
+                            .FirstOrDefault();
             var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -82,10 +88,10 @@ namespace motel.Controllers
             new Claim(ClaimTypes.Surname, user.lastname),    // Sử dụng Surname thay vì Name cho họ
             new Claim(ClaimTypes.Gender, user.gender ? "Nam" : "Nữ"),
             new Claim(ClaimTypes.Role, user.roleId.ToString()),
-            new Claim(ClaimTypes.UserData, user.users_tier.tiers.tiername.ToString()), // Sử dụng UserData cho thông tin người dùng khác
+            new Claim(ClaimTypes.UserData, userTier.tierId.ToString()    ?? string.Empty),
             new Claim(ClaimTypes.StreetAddress, user.address), // Sử dụng StreetAddress cho địa chỉ
             new Claim(ClaimTypes.DateOfBirth, user.birthday.ToString("yyyy-MM-dd")), // Sử dụng DateOfBirth cho ngày sinh, và định dạng ISO 8601
-            new Claim("profilePicture", user.actualFile),
+            new Claim("profilePicture", user.actualFile ?? string.Empty),
         };
 
             // Cấu hình và tạo token

@@ -21,26 +21,26 @@ tierRepository)
             _tierRepository = tierRepository;
         }
         [HttpGet("get-all-tier")]
-        public IActionResult GetAllAuthor()
+        public IActionResult GetAllTier([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var allAuthors = _tierRepository.GetlAllTier();
             return Ok(allAuthors);
         }
         [HttpGet("get-tier-id")]
-        public IActionResult GetAuthorById(int id)
+        public IActionResult GetTierById(int id)
         {
             var tierWithId = _tierRepository.GetTierById(id);
             return Ok(tierWithId);
         }
         [HttpPost("add-tier")]
-        public IActionResult AddAuthors([FromBody] AddTiersDTO
+        public IActionResult AddTier([FromBody] AddTiersDTO
        addTierDTO)
         {
             var tierAdd = _tierRepository.AddTier(addTierDTO);
             return Ok();
         }
         [HttpPut("update-tier-id")]
-        public IActionResult UpdateBookById(int id, [FromBody] AddTiersDTO TierDTO)
+        public IActionResult UpdateTierById(int id, [FromBody] AddTiersDTO TierDTO)
         {
             var tierUpdate = _tierRepository.UpdateTierById(id, TierDTO);
             return Ok(tierUpdate);

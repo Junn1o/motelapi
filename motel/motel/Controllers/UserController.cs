@@ -26,10 +26,10 @@ namespace motel.Controllers
 
         }
         [HttpGet("get-all-users")]
-        public IActionResult GetAll([FromQuery] int pageNumber = 1, [FromQuery]  int pageSize = 5)
+        public IActionResult GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery,[FromQuery] int pageNumber = 1, [FromQuery]  int pageSize = 5)
         {
             // su dung reposity pattern 
-            var allUsers = _userRepositories.GetAllUser(pageNumber,pageSize);
+            var allUsers = _userRepositories.GetAllUser(filterOn, filterQuery,pageNumber, pageSize);
             return Ok(allUsers);
             
         }
