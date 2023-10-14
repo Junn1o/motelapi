@@ -6,7 +6,7 @@ namespace motel.Repositories
 {
     public interface IPostRepository
     {
-        PostListResult GetAllPost([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10);
+        PostListResult GetAllPost(string? filterOn = null, string? filterQuery = null, int pageNumber = 1, int pageSize = 10);
         PostListResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10);
         PostNoIdDTO GetPostByID(int id);
         AddPostDTO AddPost(AddPostDTO addpost);
