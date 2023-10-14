@@ -13,8 +13,9 @@ namespace motel.Repositories
         {
             _appDbContext = appDbContext;
         }
-        public PostListResult GetAllPost(int pageNumber = 1, int pageSize = 10)
+        public PostListResult GetAllPost(string? filterOn = null, string? filterQuery = null,int pageNumber = 1, int pageSize = 10)
         {
+            //var posts = _appDbContext.Post.Include(post => post.post_manage).ToList();
             var postlist = _appDbContext.Post.Select(p => new PostDTO()
             {
                 Id = p.Id,
@@ -30,7 +31,16 @@ namespace motel.Repositories
                 authorid = p.userId,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
-            });
+            }).AsQueryable();
+
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("isHire", StringComparison.OrdinalIgnoreCase))
+                {
+                    postlist = postlist.Where(x => x.isHire.Contains(filterQuery));
+                }
+            }
+
             var skipResults = (pageNumber - 1) * pageSize;
             var totalPost = postlist.Count();
             var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
@@ -62,7 +72,7 @@ namespace motel.Repositories
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
                 categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
-            });
+            }).AsQueryable();
             var totalPost = postlist.Count();
             var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
             var posts = postlist.OrderBy(p => p.Id).Skip(skipResults).Take(pageSize).ToList();

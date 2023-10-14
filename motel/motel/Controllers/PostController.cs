@@ -2,6 +2,7 @@
 using motel.Data;
 using motel.Models.DTO;
 using motel.Repositories;
+using System.Globalization;
 
 namespace motel.Controllers
 {
@@ -17,9 +18,9 @@ namespace motel.Controllers
             _ipostRepository = ipostRepository;
         }
         [HttpGet("Get-all-post")]
-        public IActionResult GetAllPost([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetAllPost([FromQuery] string? filterOn, [FromQuery] string? filterQuery, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var postlist = _ipostRepository.GetAllPost(pageNumber, pageSize);
+            var postlist = _ipostRepository.GetAllPost(filterOn, filterQuery, pageNumber, pageSize);
             if (postlist != null)
             {
                 return Ok(postlist);
