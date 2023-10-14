@@ -6,7 +6,7 @@ namespace motel.Repositories
 {
     public interface IUserRepositories
     {
-        UserListResult GetAllUser(int pageNumber = 1, int pageSize = 1000);
+        UserListResult GetAllUser(string? filterOn = null, string? filterQuery = null,int pageNumber = 1, int pageSize = 1000);
         UserNoIdDTO GetUserById(int id);
         UserRoleResult GetAllUserRole(int pageNumber = 1, int pageSize = 10);
         EditUserRoleDTO EditUserRole(EditUserRoleDTO role);

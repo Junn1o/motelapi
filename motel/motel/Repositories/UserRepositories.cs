@@ -99,8 +99,8 @@ namespace motel.Repositories
             return userDomain;
         }
 
-        UserListResult IUserRepositories.GetAllUser(int pageNumber = 1, int
-pageSize = 5)
+        UserListResult IUserRepositories.GetAllUser(string? filterOn = null, string?
+filterQuery = null,int pageNumber = 1, int pageSize = 5)
         {
             var skipResults = (pageNumber - 1) * pageSize;
 
@@ -121,8 +121,16 @@ pageSize = 5)
                 posts = user.post.ToList(),
                 datecreated = user.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = user.actualFile,
-            });
-
+            }).AsQueryable();
+            //filtering
+            if (string.IsNullOrWhiteSpace(filterOn) == false &&
+           string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("firstname", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(x => x.firstname.Contains(filterQuery));
+                }
+            }
             var totalUsers = query.Count();
             var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
 

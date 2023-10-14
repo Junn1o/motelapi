@@ -35,15 +35,34 @@ namespace motel.Repositories
             return null;
         }
 
-        List<TiersDTO> ITierRepositories.GetlAllTier()
+        TiersListResult ITierRepositories.GetlAllTier(int pageNumber = 1, int pageSize = 5)
         {
-            var allTiers = _dbContext.Tiers.Select(Tiers => new TiersDTO()
+            var skipResults = (pageNumber - 1) * pageSize;
+
+            var query = _dbContext.Tiers.Select(Tiers => new TiersDTO
             {
                 Id = Tiers.Id,
                 tiername = Tiers.tiername,
                 Users = Tiers.tier_user.Select(n => n.user.firstname + " " + n.user.lastname).ToList()
             }).ToList();
-            return allTiers;
+           
+            var totalTiers = query.Count();
+            var totalPages = (int)Math.Ceiling((double)totalTiers / pageSize);
+
+            var tiers = query
+                .OrderBy(u => u.Id)
+                .Skip(skipResults)
+                .Take(pageSize)
+                .ToList();
+
+            var result = new TiersListResult
+            {
+                Tiers = tiers,
+                total = totalTiers,
+                TotalPages = totalPages,
+            };
+
+            return result;
         }
 
          TiersNoIdDTO ITierRepositories.GetTierById(int id)

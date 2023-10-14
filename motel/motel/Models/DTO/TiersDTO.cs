@@ -15,4 +15,10 @@
     {
         public string tiername { get; set; }
     }
+    public class TiersListResult
+    {
+        public List<TiersDTO> Tiers { get; set; }
+        public int total { get; set; }
+        public int TotalPages { get; set; }
+    }
 }
