@@ -1,4 +1,5 @@
-﻿using motel.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
 
@@ -67,11 +68,28 @@ namespace motel.Repositories
 
          TiersNoIdDTO ITierRepositories.GetTierById(int id)
         {
+            var userTier = _dbContext.Tiers
+                .Include(t => t.tier_user)
+                .ThenInclude(tu => tu.user).ThenInclude(r=>r.role)
+                .Where(t => t.Id == id)
+                .FirstOrDefault();
             var TierWithDomain = _dbContext.Tiers.Where(n => n.Id == id);
-            var TierWithIdDTO = TierWithDomain.Select(Tier => new TiersNoIdDTO(){
-                tiername = Tier.tiername,
-                Users = Tier.tier_user.Select(n => n.user.firstname + " " + n.user.lastname).ToList()
-            }).FirstOrDefault();
+            var TierWithIdDTO = new TiersNoIdDTO()
+            {
+                tiername = userTier.tiername,
+                Users = userTier.tier_user.Select(n => n.user.firstname + " " + n.user.lastname).ToList(),
+                ListUsers = userTier.tier_user.Select(tu => new UserTierDTO
+                {
+                    Id = tu.user.Id,
+                    firstname = tu.user.firstname,
+                    lastname = tu.user.lastname,
+                    birthday = tu.user.birthday.ToString("dd/MM/yyyy"),
+                    address = tu.user.address,
+                    gender = tu.user.gender,
+                    phone = tu.user.phone,
+                    rolename = tu.user.role.rolename,
+                }).ToList(),
+            };
             return TierWithIdDTO;
         }
 

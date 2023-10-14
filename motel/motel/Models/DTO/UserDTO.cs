@@ -28,7 +28,6 @@ namespace motel.Models.DTO
     }
     public class UserNoIdDTO
     {
-        
         public string fullname { get; set; }
         public string gender { get; set; }
         public string address { get; set; }
