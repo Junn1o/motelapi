@@ -15,7 +15,6 @@ namespace motel.Repositories
         }
         public PostListResult GetAllPost(string? filterOn = null, string? filterQuery = null,int pageNumber = 1, int pageSize = 10)
         {
-            //var posts = _appDbContext.Post.Include(post => post.post_manage).ToList();
             var postlist = _appDbContext.Post.Select(p => new PostDTO()
             {
                 Id = p.Id,
@@ -30,6 +29,7 @@ namespace motel.Repositories
                 status = p.status,
                 authorid = p.userId,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
+                FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
             }).AsQueryable();
 
@@ -70,6 +70,7 @@ namespace motel.Repositories
                 status = p.status,
                 authorid = p.userId,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
+                FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
                 categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
             }).AsQueryable();
@@ -99,7 +100,7 @@ namespace motel.Repositories
                 isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
                 status = p.status,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
-                //FormattedDateapprove = p.post_manage.FirstOrDefault(pm=>pm.dateapproved.ToString("dd/MM/yyyy")),
+                FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
             }).FirstOrDefault();
             return getPostDTO;

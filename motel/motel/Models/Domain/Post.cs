@@ -13,7 +13,7 @@ namespace motel.Models.Domain
         public decimal price { get; set; }
         public int userId { get; set; }
         public User user { get; set; }
-        public List<Post_Manage> post_manage { get; set; }
+        public Post_Manage post_manage { get; set; }
         public List<Post_Category> post_category {get; set; }
         public string status { get; set; }
         public bool isHire { get; set; }
