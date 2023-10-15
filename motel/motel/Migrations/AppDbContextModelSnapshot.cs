@@ -36,16 +36,13 @@ namespace motel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category", (string)null);
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Post", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("actualFile")
                         .HasColumnType("nvarchar(max)");
@@ -86,7 +83,7 @@ namespace motel.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("Post", (string)null);
+                    b.ToTable("Post");
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Post_Category", b =>
@@ -109,7 +106,7 @@ namespace motel.Migrations
 
                     b.HasIndex("postId");
 
-                    b.ToTable("Post_Category", (string)null);
+                    b.ToTable("Post_Category");
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Post_Manage", b =>
@@ -134,11 +131,9 @@ namespace motel.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("postId");
-
                     b.HasIndex("userAdminId");
 
-                    b.ToTable("Post_Manage", (string)null);
+                    b.ToTable("Post_Manage");
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Role", b =>
@@ -155,7 +150,7 @@ namespace motel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Tier_User", b =>
@@ -188,7 +183,7 @@ namespace motel.Migrations
                     b.HasIndex("userId")
                         .IsUnique();
 
-                    b.ToTable("Tier_User", (string)null);
+                    b.ToTable("Tier_User");
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Tiers", b =>
@@ -209,7 +204,7 @@ namespace motel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tiers", (string)null);
+                    b.ToTable("Tiers");
                 });
 
             modelBuilder.Entity("motel.Models.Domain.User", b =>
@@ -259,16 +254,24 @@ namespace motel.Migrations
 
                     b.HasIndex("roleId");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Post", b =>
                 {
+                    b.HasOne("motel.Models.Domain.Post_Manage", "post_manage")
+                        .WithOne("post")
+                        .HasForeignKey("motel.Models.Domain.Post", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("motel.Models.Domain.User", "user")
                         .WithMany("post")
                         .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("post_manage");
 
                     b.Navigation("user");
                 });
@@ -294,17 +297,9 @@ namespace motel.Migrations
 
             modelBuilder.Entity("motel.Models.Domain.Post_Manage", b =>
                 {
-                    b.HasOne("motel.Models.Domain.Post", "post")
-                        .WithMany("post_manage")
-                        .HasForeignKey("postId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("motel.Models.Domain.User", "user")
                         .WithMany("post_manage")
                         .HasForeignKey("userAdminId");
-
-                    b.Navigation("post");
 
                     b.Navigation("user");
                 });
@@ -347,8 +342,12 @@ namespace motel.Migrations
             modelBuilder.Entity("motel.Models.Domain.Post", b =>
                 {
                     b.Navigation("post_category");
+                });
 
-                    b.Navigation("post_manage");
+            modelBuilder.Entity("motel.Models.Domain.Post_Manage", b =>
+                {
+                    b.Navigation("post")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("motel.Models.Domain.Role", b =>
