@@ -13,7 +13,7 @@ namespace motel.Repositories
         {
             _appDbContext = appDbContext;
         }
-        public PostListResult GetAllPost(string? filterOn = null, string? filterQuery = null,int pageNumber = 1, int pageSize = 10)
+        public PostListResult GetAllPost(string? filterOn = null, string? filterQuery = null, string? filterStatus = null, string? filterQuery2 = null, string? sortBy = null, bool isAscending = true, int pageNumber = 1, int pageSize = 10)
         {
             var postlist = _appDbContext.Post.Select(p => new PostDTO()
             {
@@ -32,19 +32,29 @@ namespace motel.Repositories
                 FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
             }).AsQueryable();
-
-            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery) && !string.IsNullOrWhiteSpace(filterStatus) && !string.IsNullOrWhiteSpace(filterQuery2))
             {
-                if (filterOn.Equals("isHire", StringComparison.OrdinalIgnoreCase))
+                if (filterOn.Equals("isHire", StringComparison.OrdinalIgnoreCase) && filterStatus.Equals("status", StringComparison.OrdinalIgnoreCase))
                 {
-                    postlist = postlist.Where(x => x.isHire.Contains(filterQuery));
+                    postlist = postlist.Where(x => x.isHire.Contains(filterQuery) && x.status.Contains(filterQuery2));
+                }
+            }
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("FormattedDateapprove", StringComparison.OrdinalIgnoreCase))
+                {
+                    postlist = isAscending ? postlist.OrderBy(x => x.FormattedDateapprove) : postlist.OrderByDescending(x => x.FormattedDateapprove);
                 }
             }
 
+            if (postlist == null)
+            {
+                return null;
+            }
             var skipResults = (pageNumber - 1) * pageSize;
             var totalPost = postlist.Count();
             var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
-            var posts = postlist.OrderBy(p=>p.Id).Skip(skipResults).Take(pageSize).ToList();
+            var posts = postlist.OrderBy(p => p.Id).Skip(skipResults).Take(pageSize).ToList();
             var result = new PostListResult
             {
                 Post = posts,
@@ -108,50 +118,42 @@ namespace motel.Repositories
         public AddPostDTO AddPost(AddPostDTO addpost)
         {
             var user = _appDbContext.User.FirstOrDefault(a => a.Id == addpost.userId);
-            if (user.roleId == 1 || user.roleId == 5)
+            var postDomain = new Post
             {
-                var postDomain = new Post
-                {
-                    title = addpost.title,
-                    price = addpost.price,
-                    address = addpost.address,
-                    description = addpost.description,
-                    userId = (int)addpost.userId,
-                    status = addpost.status = "Đang Chờ Duyệt",
-                    isHire = (bool)(addpost.isHire = false),
-                    area = addpost.area,
-                    datecreatedroom = (DateTime)(addpost.dateCreated = DateTime.Now),
-                };
-                _appDbContext.Add(postDomain);
+                title = addpost.title,
+                price = addpost.price,
+                address = addpost.address,
+                description = addpost.description,
+                userId = (int)addpost.userId,
+                status = addpost.status = "Đang Chờ Duyệt",
+                isHire = (bool)(addpost.isHire = false),
+                area = addpost.area,
+                datecreatedroom = (DateTime)(addpost.dateCreated = DateTime.Now),
+            };
+            _appDbContext.Add(postDomain);
+            _appDbContext.SaveChanges();
+            if (addpost.FileUri != null)
+            {
+                addpost.actualFile = UploadImage(addpost.FileUri, user.Id, user.datecreated.ToString("yyyy"), postDomain.Id);
+                postDomain.actualFile = addpost.actualFile;
                 _appDbContext.SaveChanges();
-                //var user = _appDbContext.User.FirstOrDefault(a => a.Id == addpost.userId);
-                if (addpost.FileUri != null)
-                {
-                    addpost.actualFile = UploadImage(addpost.FileUri, user.Id, user.datecreated.ToString("yyyy"), postDomain.Id);
-                    postDomain.actualFile = addpost.actualFile;
-                    _appDbContext.SaveChanges();
-                }
-                foreach (var id in addpost.categoryids)
-                {
-                    var post_category = new Post_Category()
-                    {
-                        postId = postDomain.Id,
-                        categoryId = id,
-                    };
-                    _appDbContext.Post_Category.Add(post_category);
-                    _appDbContext.SaveChanges();
-                }
-                var postManage = new Post_Manage
+            }
+            foreach (var id in addpost.categoryids)
+            {
+                var post_category = new Post_Category()
                 {
                     postId = postDomain.Id,
+                    categoryId = id,
                 };
-                _appDbContext.Post_Manage.Add(postManage);
+                _appDbContext.Post_Category.Add(post_category);
                 _appDbContext.SaveChanges();
             }
-            else
+            var postManage = new Post_Manage
             {
-                return null;
-            }
+                postId = postDomain.Id,
+            };
+            _appDbContext.Post_Manage.Add(postManage);
+            _appDbContext.SaveChanges();
             return addpost;
         }
         public AddPostDTO UpdatePost(int id, AddPostDTO updatepost)

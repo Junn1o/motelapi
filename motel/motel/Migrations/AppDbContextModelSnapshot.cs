@@ -42,7 +42,10 @@ namespace motel.Migrations
             modelBuilder.Entity("motel.Models.Domain.Post", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("actualFile")
                         .HasColumnType("nvarchar(max)");
@@ -130,6 +133,9 @@ namespace motel.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("postId")
+                        .IsUnique();
 
                     b.HasIndex("userAdminId");
 
@@ -259,19 +265,11 @@ namespace motel.Migrations
 
             modelBuilder.Entity("motel.Models.Domain.Post", b =>
                 {
-                    b.HasOne("motel.Models.Domain.Post_Manage", "post_manage")
-                        .WithOne("post")
-                        .HasForeignKey("motel.Models.Domain.Post", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("motel.Models.Domain.User", "user")
                         .WithMany("post")
                         .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("post_manage");
 
                     b.Navigation("user");
                 });
@@ -297,9 +295,15 @@ namespace motel.Migrations
 
             modelBuilder.Entity("motel.Models.Domain.Post_Manage", b =>
                 {
+                    b.HasOne("motel.Models.Domain.Post", "post")
+                        .WithOne("post_manage")
+                        .HasForeignKey("motel.Models.Domain.Post_Manage", "postId");
+
                     b.HasOne("motel.Models.Domain.User", "user")
                         .WithMany("post_manage")
                         .HasForeignKey("userAdminId");
+
+                    b.Navigation("post");
 
                     b.Navigation("user");
                 });
@@ -342,11 +346,8 @@ namespace motel.Migrations
             modelBuilder.Entity("motel.Models.Domain.Post", b =>
                 {
                     b.Navigation("post_category");
-                });
 
-            modelBuilder.Entity("motel.Models.Domain.Post_Manage", b =>
-                {
-                    b.Navigation("post")
+                    b.Navigation("post_manage")
                         .IsRequired();
                 });
 

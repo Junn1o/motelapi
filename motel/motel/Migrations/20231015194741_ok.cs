@@ -80,24 +80,31 @@ namespace motel.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Post_Manage",
+                name: "Post",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    postId = table.Column<int>(type: "int", nullable: false),
-                    userAdminId = table.Column<int>(type: "int", nullable: true),
-                    reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    dateapproved = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    userId = table.Column<int>(type: "int", nullable: false),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isHire = table.Column<bool>(type: "bit", nullable: false),
+                    datecreatedroom = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    area = table.Column<int>(type: "int", nullable: false),
+                    address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    actualFile = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Post_Manage", x => x.Id);
+                    table.PrimaryKey("PK_Post", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Post_Manage_User_userAdminId",
-                        column: x => x.userAdminId,
+                        name: "FK_Post_User_userId",
+                        column: x => x.userId,
                         principalTable: "User",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -130,39 +137,6 @@ namespace motel.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Post",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    userId = table.Column<int>(type: "int", nullable: false),
-                    status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    isHire = table.Column<bool>(type: "bit", nullable: false),
-                    datecreatedroom = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    area = table.Column<int>(type: "int", nullable: false),
-                    address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    actualFile = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Post", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Post_Post_Manage_Id",
-                        column: x => x.Id,
-                        principalTable: "Post_Manage",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Post_User_userId",
-                        column: x => x.userId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Post_Category",
                 columns: table => new
                 {
@@ -188,6 +162,32 @@ namespace motel.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Post_Manage",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    postId = table.Column<int>(type: "int", nullable: false),
+                    userAdminId = table.Column<int>(type: "int", nullable: true),
+                    reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    dateapproved = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Post_Manage", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Post_Manage_Post_postId",
+                        column: x => x.postId,
+                        principalTable: "Post",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Post_Manage_User_userAdminId",
+                        column: x => x.userAdminId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Post_userId",
                 table: "Post",
@@ -202,6 +202,12 @@ namespace motel.Migrations
                 name: "IX_Post_Category_postId",
                 table: "Post_Category",
                 column: "postId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Post_Manage_postId",
+                table: "Post_Manage",
+                column: "postId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Post_Manage_userAdminId",
@@ -232,6 +238,9 @@ namespace motel.Migrations
                 name: "Post_Category");
 
             migrationBuilder.DropTable(
+                name: "Post_Manage");
+
+            migrationBuilder.DropTable(
                 name: "Tier_User");
 
             migrationBuilder.DropTable(
@@ -242,9 +251,6 @@ namespace motel.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tiers");
-
-            migrationBuilder.DropTable(
-                name: "Post_Manage");
 
             migrationBuilder.DropTable(
                 name: "User");
