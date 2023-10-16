@@ -17,6 +17,9 @@ namespace motel.Models.DTO
         public string status { get; set; }
         public string isHire { get; set; }
         public string actualFile { get; set; }
+        public string postTier { get; set; }
+        public DateTime dateCreated { get; set; }
+        public DateTime dateApproved { get; set; }
         public string FormattedDatecreated { get; set; }
         public string FormattedDateapprove { get; set; }
         public List<string> categorylist { get; set; }

@@ -2,6 +2,7 @@
 using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
+using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace motel.Repositories
@@ -13,7 +14,14 @@ namespace motel.Repositories
         {
             _appDbContext = appDbContext;
         }
-        public PostListResult GetAllPost(string? filterOn = null, string? filterQuery = null, string? filterStatus = null, string? filterQuery2 = null, string? sortBy = null, bool isAscending = true, int pageNumber = 1, int pageSize = 10)
+        public PostListResult GetAllPost(
+            string? filterHire = null, string? hireState = null, 
+            string? filterStatus = null, string? statusState = null, 
+            string? filterPrice = null, decimal? minPrice = null, decimal? maxPrice = null, 
+            string? filterArea = null, int? minArea = null, int? maxArea = null,
+            string? filterCate = null, int? category = null,
+            string? sortBy = null, bool isAscending = true,
+            int pageNumber = 1, int pageSize = 10)
         {
             var postlist = _appDbContext.Post.Select(p => new PostDTO()
             {
@@ -28,25 +36,67 @@ namespace motel.Repositories
                 isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
                 status = p.status,
                 authorid = p.userId,
+                dateCreated = p.datecreatedroom,
+                //dateApproved = p.post_manage.dateapproved.Value,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
+                postTier = p.user.users_tier.tiers.tiername,
+                categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
                 categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
             }).AsQueryable();
-            if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery) && !string.IsNullOrWhiteSpace(filterStatus) && !string.IsNullOrWhiteSpace(filterQuery2))
+
+            // Search theo trạng thái thuê
+            if (!string.IsNullOrWhiteSpace(filterHire) && !string.IsNullOrWhiteSpace(hireState))
             {
-                if (filterOn.Equals("isHire", StringComparison.OrdinalIgnoreCase) && filterStatus.Equals("status", StringComparison.OrdinalIgnoreCase))
+                if (filterHire.Equals("isHire", StringComparison.OrdinalIgnoreCase) && filterStatus.Equals("status", StringComparison.OrdinalIgnoreCase))
                 {
-                    postlist = postlist.Where(x => x.isHire.Contains(filterQuery) && x.status.Contains(filterQuery2));
+                    postlist = postlist.Where(x => x.isHire.Contains(hireState));
                 }
             }
-            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            // Search theo trạng thái duyệt
+            if (!string.IsNullOrWhiteSpace(filterStatus))
             {
-                if (sortBy.Equals("FormattedDateapprove", StringComparison.OrdinalIgnoreCase))
+                if (filterStatus.Equals("status", StringComparison.OrdinalIgnoreCase))
                 {
-                    postlist = isAscending ? postlist.OrderBy(x => x.FormattedDateapprove) : postlist.OrderByDescending(x => x.FormattedDateapprove);
+                    postlist = postlist.Where(x => x.status.Contains(statusState));
                 }
             }
 
+            // Search theo range price
+            if (!string.IsNullOrWhiteSpace(filterPrice))
+            {
+                if (filterPrice.Equals("price", StringComparison.OrdinalIgnoreCase))
+                {
+                    postlist = postlist.Where(x => x.price >= minPrice && x.price <= maxPrice);
+                }
+            }
+
+            // Search theo area range
+            if (!string.IsNullOrWhiteSpace(filterArea))
+            {
+                if (filterArea.Equals("area", StringComparison.OrdinalIgnoreCase))
+                {
+                    postlist = postlist.Where(x => x.area >= minArea && x.area <= maxArea);
+                }
+            }
+
+            // Search theo area range
+            if (!string.IsNullOrWhiteSpace(filterCate))
+            {
+                if (filterCate.Equals("categoryids", StringComparison.OrdinalIgnoreCase))
+                {
+                    postlist = postlist.Where(x => x.categoryids.Contains((int)category));
+                }
+            }
+
+            // Sort theo ngày tạo gần nhất
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                if (sortBy.Equals("dateCreated", StringComparison.OrdinalIgnoreCase))
+                {
+                    postlist = isAscending ? postlist.OrderBy(x => x.dateCreated) : postlist.OrderByDescending(x => x.dateCreated);
+                }
+            }
             if (postlist == null)
             {
                 return null;
@@ -54,14 +104,28 @@ namespace motel.Repositories
             var skipResults = (pageNumber - 1) * pageSize;
             var totalPost = postlist.Count();
             var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
-            var posts = postlist.OrderBy(p => p.Id).Skip(skipResults).Take(pageSize).ToList();
-            var result = new PostListResult
+            if (!string.IsNullOrWhiteSpace(sortBy))
             {
-                Post = posts,
-                total = totalPost,
-                TotalPages = totalPages,
-            };
-            return result;
+                var posts = postlist.Skip(skipResults).Take(pageSize).ToList();
+                var result = new PostListResult
+                {
+                    Post = posts,
+                    total = totalPost,
+                    TotalPages = totalPages,
+                };
+                return result;
+            }
+            else
+            {
+                var posts = postlist.OrderBy(p => p.Id).Skip(skipResults).Take(pageSize).ToList();
+                var result = new PostListResult
+                {
+                    Post = posts,
+                    total = totalPost,
+                    TotalPages = totalPages,
+                };
+                return result;
+            }
         }
         public PostListResult GetAllPostAdmin(int pageNumber = 1, int pageSize = 10)
         {
