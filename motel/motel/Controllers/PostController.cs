@@ -18,9 +18,9 @@ namespace motel.Controllers
             _ipostRepository = ipostRepository;
         }
         [HttpGet("Get-all-post")]
-        public IActionResult GetAllPost([FromQuery] string? filterOn, [FromQuery] string? filterQuery, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetAllPost([FromQuery] string? filterOn, [FromQuery] string? filterQuery, [FromQuery] string? filterStatus, [FromQuery] string? filterQuery2, [FromQuery] string? sortBy, [FromQuery] bool isAscending, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var postlist = _ipostRepository.GetAllPost(filterOn, filterQuery, pageNumber, pageSize);
+            var postlist = _ipostRepository.GetAllPost(filterOn, filterQuery, filterStatus, filterQuery2, sortBy, isAscending, pageNumber, pageSize);
             if (postlist != null)
             {
                 return Ok(postlist);
