@@ -19,20 +19,22 @@ namespace motel.Controllers
         }
         [HttpGet("Get-all-post")]
         public IActionResult GetAllPost(
-            [FromQuery] string? filterHire, [FromQuery] string? hireState, 
-            [FromQuery] string? filterStatus, [FromQuery] string? statusState, 
-            [FromQuery] string? filterPrice, [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice,
-            [FromQuery] string? filterArea, [FromQuery] int? minArea, [FromQuery] int? maxArea,
-            [FromQuery] string? filterCate, [FromQuery] int? category,
+            [FromQuery] string? hireState, 
+            [FromQuery] string? statusState, 
+            [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice,
+            [FromQuery] int? minArea, [FromQuery] int? maxArea,
+            [FromQuery] int? category,
+            [FromQuery] string? isVip,
             [FromQuery] string? sortBy, [FromQuery] bool isAscending,
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var postlist = _ipostRepository.GetAllPost(
-                filterHire, hireState, 
-                filterStatus, statusState, 
-                filterPrice, minPrice, maxPrice, 
-                filterArea, minArea, maxArea,
-                filterCate, category,
+                hireState, 
+                statusState, 
+                minPrice, maxPrice, 
+                minArea, maxArea,
+                category,
+                isVip,
                 sortBy, isAscending, 
                 pageNumber, pageSize);
             if (postlist != null)
