@@ -43,7 +43,7 @@ namespace motel.Repositories
                 status = p.status,
                 authorid = p.userId,
                 dateCreated = p.datecreatedroom,
-                //dateApproved = p.post_manage.dateapproved.Value,
+                dateApproved = p.post_manage.dateapproved.Value,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
                 postTier = p.user.users_tier.tiers.tiername,
@@ -109,23 +109,60 @@ namespace motel.Repositories
                     postlist = postlist.Where(x => x.postTier.Equals("Hạng Vip"));
                 }
             }
-
-
-            // Sort theo ngày tạo gần nhất
-            if (!string.IsNullOrWhiteSpace(sortBy))
-            {
-
-            }
             if (postlist == null)
             {
                 return null;
             }
             var skipResults = (pageNumber - 1) * pageSize;
-            var totalPost = postlist.Count();
-            var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
+            // Sort theo ngày tạo gần nhất
+            DateTime now = DateTime.Now;
+            DateTime oneDayAgo = now.AddDays(-30);
             if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("dateCreated", StringComparison.OrdinalIgnoreCase))
             {
-                var posts = isAscending ? postlist.OrderBy(x => x.dateCreated).Skip(skipResults).Take(pageSize).ToList() : postlist.OrderByDescending(x => x.dateCreated).Skip(skipResults).Take(pageSize).ToList();
+                var posts = isAscending ? 
+                    postlist
+                    .OrderBy(x => x.dateCreated)
+                    .Skip(skipResults)
+                    .Take(pageSize)
+                    .ToList() : 
+                    postlist
+                    .OrderByDescending(x => x.dateCreated)
+                    .Skip(skipResults)
+                    .Take(pageSize)
+                    .ToList();
+                if (posts == null || !posts.Any())
+                {
+                    return null;
+                }
+                var totalPost = postlist.Count();
+                var totalPages = (int)Math.Ceiling((double)totalPost/pageSize);
+                var result = new PostListResult
+                {
+                    Post = posts,
+                    total = totalPost,
+                    TotalPages = totalPages,
+                };
+                return result;
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("newList", StringComparison.OrdinalIgnoreCase))
+            {
+                var posts = isAscending ? 
+                    postlist.Where(p => p.dateCreated <= now && p.dateCreated >= oneDayAgo)
+                        .OrderBy(x => x.dateCreated)
+                        .Skip(skipResults)
+                        .Take(pageSize)
+                        .ToList() : 
+                    postlist.Where(p => p.dateCreated <= now && p.dateCreated >= oneDayAgo)
+                        .OrderByDescending(x => x.dateCreated)
+                        .Skip(skipResults)
+                        .Take(pageSize)
+                        .ToList();
+                if (posts == null || !posts.Any())
+                {
+                    return null;
+                }
+                var totalPost = posts.Count();
+                var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
                 var result = new PostListResult
                 {
                     Post = posts,
@@ -136,7 +173,17 @@ namespace motel.Repositories
             }
             else
             {
-                var posts = postlist.OrderBy(p => p.Id).Skip(skipResults).Take(pageSize).ToList();
+                var posts = postlist
+                    .OrderBy(p => p.Id)
+                    .Skip(skipResults)
+                    .Take(pageSize)
+                    .ToList();
+                if (posts == null || !posts.Any())
+                {
+                    return null;
+                }
+                var totalPost = postlist.Count();
+                var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
                 var result = new PostListResult
                 {
                     Post = posts,
