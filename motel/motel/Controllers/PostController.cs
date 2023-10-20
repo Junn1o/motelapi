@@ -18,15 +18,31 @@ namespace motel.Controllers
             _ipostRepository = ipostRepository;
         }
         [HttpGet("Get-all-post")]
-        public IActionResult GetAllPost([FromQuery] string? filterOn, [FromQuery] string? filterQuery, [FromQuery] string? filterStatus, [FromQuery] string? filterQuery2, [FromQuery] string? sortBy, [FromQuery] bool isAscending, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetAllPost(
+            [FromQuery] string? hireState, 
+            [FromQuery] string? statusState, 
+            [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice,
+            [FromQuery] int? minArea, [FromQuery] int? maxArea,
+            [FromQuery] int? category,
+            [FromQuery] string? isVip,
+            [FromQuery] string? sortBy, [FromQuery] bool isAscending,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var postlist = _ipostRepository.GetAllPost(filterOn, filterQuery, filterStatus, filterQuery2, sortBy, isAscending, pageNumber, pageSize);
+            var postlist = _ipostRepository.GetAllPost(
+                hireState, 
+                statusState, 
+                minPrice, maxPrice, 
+                minArea, maxArea,
+                category,
+                isVip,
+                sortBy, isAscending, 
+                pageNumber, pageSize);
             if (postlist != null)
             {
                 return Ok(postlist);
             }
             else
-                return NotFound("Data Empty");
+                return Ok("Data Empty");
         }
         [HttpGet("Get-all-post-admin")]
         public IActionResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -37,7 +53,7 @@ namespace motel.Controllers
                 return Ok(postlist);
             }
             else
-                return NotFound("Data Empty");
+                return Ok("Data Empty");
         }
         [HttpGet("Get-post-by-id")]
         public IActionResult GetPostbyId(int id)
@@ -48,7 +64,7 @@ namespace motel.Controllers
                 return Ok(postlist);
             }
             else
-                return NotFound("Data Empty");
+                return Ok("Data Empty");
         }
         [HttpPost("add-post")]
         public IActionResult AddPost([FromForm] AddPostDTO addPost)
