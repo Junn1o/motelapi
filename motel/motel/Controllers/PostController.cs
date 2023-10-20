@@ -42,7 +42,7 @@ namespace motel.Controllers
                 return Ok(postlist);
             }
             else
-                return NotFound("Data Empty");
+                return Ok("Data Empty");
         }
         [HttpGet("Get-all-post-admin")]
         public IActionResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -53,7 +53,7 @@ namespace motel.Controllers
                 return Ok(postlist);
             }
             else
-                return NotFound("Data Empty");
+                return Ok("Data Empty");
         }
         [HttpGet("Get-post-by-id")]
         public IActionResult GetPostbyId(int id)
@@ -64,7 +64,7 @@ namespace motel.Controllers
                 return Ok(postlist);
             }
             else
-                return NotFound("Data Empty");
+                return Ok("Data Empty");
         }
         [HttpPost("add-post")]
         public IActionResult AddPost([FromForm] AddPostDTO addPost)
