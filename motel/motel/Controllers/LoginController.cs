@@ -56,7 +56,7 @@ namespace motel.Controllers
             var userAddress = claimsPrincipal.FindFirst(ClaimTypes.StreetAddress)?.Value;
             var userBirthday = claimsPrincipal.FindFirst(ClaimTypes.DateOfBirth)?.Value;
             var userAvatar = claimsPrincipal.FindFirst("profilePicture")?.Value;
-
+            var userPhone = claimsPrincipal.FindFirst("phone")?.Value;
             // Sử dụng thông tin như cần
             // ...
 
@@ -72,6 +72,7 @@ namespace motel.Controllers
                 Address = userAddress,
                 Birthday = userBirthday,
                 Avatar = userAvatar,
+                Phone = userPhone,
             });
         }
 
@@ -91,6 +92,7 @@ namespace motel.Controllers
             new Claim(ClaimTypes.UserData, userTier.tierId.ToString()    ?? string.Empty),
             new Claim(ClaimTypes.StreetAddress, user.address), // Sử dụng StreetAddress cho địa chỉ
             new Claim(ClaimTypes.DateOfBirth, user.birthday.ToString("yyyy-MM-dd")), // Sử dụng DateOfBirth cho ngày sinh, và định dạng ISO 8601
+            new Claim("phone",user.phone ),
             new Claim("profilePicture", user.actualFile ?? string.Empty),
         };
 
