@@ -44,8 +44,16 @@ namespace motel.Controllers
         [HttpPost("add-user")]
         public IActionResult AddUser([FromForm] AddUserDTO addUserDTO)
         {
-            var userAdd = _userRepositories.AddUser(addUserDTO);
-            return Ok(userAdd);
+            if (!ValidateAddUser(addUserDTO))
+            {
+                return BadRequest(ModelState);
+            }
+            if (ModelState.IsValid)
+            {
+                var userAdd = _userRepositories.AddUser(addUserDTO);
+                return Ok(userAdd);
+            }
+            return Ok(addUserDTO);
         }
         [HttpGet("get-user-with-id")]
         public IActionResult GetUserwithId(int id)
@@ -99,9 +107,85 @@ namespace motel.Controllers
                 return Ok("User deleted");
             }
         }
-        
+        #region Private methods
+        private bool ValidateAddUser(AddUserDTO user)
+        {
+            if (user == null)
+            {
+                ModelState.AddModelError(nameof(user), "Vui lòng thêm thông tin.");
+                return false;
+            }
 
+            if (string.IsNullOrEmpty(user.firstname))
+            {
+                ModelState.AddModelError(nameof(user.firstname), "Vui lòng không để trống Tên của bạn.");
+            }
+            if (string.IsNullOrEmpty(user.lastname))
+            {
+                ModelState.AddModelError(nameof(user.lastname), "Vui lòng không để trống Họ của bạn.");
+            }
+            if (user.birthday == null)
+            {
+                ModelState.AddModelError(nameof(user.birthday), "Vui lòng không để trống ngày sinh.");
+            }
+            if (user.tierId == null)
+            {
+                ModelState.AddModelError(nameof(user.tierId), "Vui lòng lựa chọn gói.");
+            }
+            //else
+            //{
+            //    // Thực hiện kiểm tra giá trị tierId có hợp lệ hay không
+            //    // Ví dụ: nếu tierId không hợp lệ, thêm lỗi vào ModelState
+            //    if (!IsValidTierId(user.tierId))
+            //    {
+            //        ModelState.AddModelError(nameof(user.tierId), "Gói không hợp lệ.");
+            //    }
+            //}
+            if (user.roleId == null)
+            {
+                ModelState.AddModelError(nameof(user.roleId), "Vui lòng lựa chọn vai trò.");
+            }
+            //else
+            //{
+            //    // Thực hiện kiểm tra giá trị roleId có hợp lệ hay không
+            //    // Ví dụ: nếu roleId không hợp lệ, thêm lỗi vào ModelState
+            //    if (!IsValidRoleId(user.roleId))
+            //    {
+            //        ModelState.AddModelError(nameof(user.roleId), "Vai trò không hợp lệ.");
+            //    }
+            //}
+
+            if (user.phone == null)
+            {
+                ModelState.AddModelError(nameof(user.phone), "Vui lòng không để trống số điện thoại.");
+            }
+            else if (_dbcontext.User.Any(u => u.phone == user.phone))
+            {
+                ModelState.AddModelError(nameof(user.phone), "Số điện thoại này đã được đăng ký bởi người dùng khác.");
+            }
+            if (user.phone == null)
+            {
+                ModelState.AddModelError(nameof(user.phone), " Số điện thoại đã được sử dụng cho một tài khoản nào đó vui lòng nhập số khác");
+            }
+
+            if (user.birthday == null)
+            {
+                ModelState.AddModelError(nameof(user.birthday), "Vui lòng không để trống ngày sinh.");
+            }
+            if (string.IsNullOrEmpty(user.address))
+            {
+                ModelState.AddModelError(nameof(user.address), "Vui lòng không để trống Địa chỉ.");
+            }
+            if (ModelState.ErrorCount > 0)
+            {
+                return false;
+            }
+            return true;
+        }
         
+        #endregion
+
+
 
     }
 }
