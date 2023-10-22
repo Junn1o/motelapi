@@ -43,7 +43,7 @@ namespace motel.Repositories
                 status = p.status,
                 authorid = p.userId,
                 dateCreated = p.datecreatedroom,
-                dateApproved = p.post_manage.dateapproved.Value,
+                //dateApproved = p.post_manage.dateapproved.Value,
                 FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
                 FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
                 postTier = p.user.users_tier.tiers.tiername,
