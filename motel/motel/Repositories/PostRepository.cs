@@ -23,34 +23,34 @@ namespace motel.Repositories
             int pageNumber = 1, int pageSize = 10)
         {
             var postlist = _appDbContext.Post
-                .Include(pm=> pm.post_manage)
+                .Include(pm => pm.post_manage)
                 .Include(pm => pm.post_category)
                 .ThenInclude(pm => pm.category)
                 .Include(pm => pm.user)
                 .ThenInclude(pm => pm.users_tier)
                 .ThenInclude(pm => pm.tiers)
                 .Select(p => new PostDTO()
-            {
-                Id = p.Id,
-                title = p.title,
-                address = p.address,
-                authorname = p.user.firstname + " " + p.user.lastname,
-                description = p.description,
-                price = p.price,
-                actualFile = GetImageFromString(p.actualFile),
-                area = p.area,
-                isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
-                status = p.status,
-                authorid = p.userId,
-                dateCreated = p.datecreatedroom,
-                //dateApproved = p.post_manage.dateapproved.Value,
-                FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
-                FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
-                postTier = p.user.users_tier.tiers.tiername,
-                phone = p.user.phone,
-                categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
-                categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
-            }).AsSplitQuery();
+                {
+                    Id = p.Id,
+                    title = p.title,
+                    address = p.address,
+                    authorname = p.user.firstname + " " + p.user.lastname,
+                    description = p.description,
+                    price = p.price,
+                    actualFile = GetImageFromString(p.actualFile),
+                    area = p.area,
+                    isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
+                    status = p.status,
+                    authorid = p.userId,
+                    dateCreated = p.datecreatedroom,
+                    dateApproved = p.post_manage.dateapproved.HasValue ? p.post_manage.dateapproved.Value : new DateTime(2020, 10, 22),
+                    FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
+                    FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
+                    postTier = p.user.users_tier.tiers.tiername,
+                    phone = p.user.phone,
+                    categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
+                    categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
+                }).AsSplitQuery();
 
             // Search theo trạng thái thuê
             if (!string.IsNullOrWhiteSpace(hireState))
@@ -119,12 +119,12 @@ namespace motel.Repositories
             DateTime oneDayAgo = now.AddDays(-30);
             if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("dateCreated", StringComparison.OrdinalIgnoreCase))
             {
-                var posts = isAscending ? 
+                var posts = isAscending ?
                     postlist
                     .OrderBy(x => x.dateCreated)
                     .Skip(skipResults)
                     .Take(pageSize)
-                    .ToList() : 
+                    .ToList() :
                     postlist
                     .OrderByDescending(x => x.dateCreated)
                     .Skip(skipResults)
@@ -135,7 +135,7 @@ namespace motel.Repositories
                     return null;
                 }
                 var totalPost = postlist.Count();
-                var totalPages = (int)Math.Ceiling((double)totalPost/pageSize);
+                var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
                 var result = new PostListResult
                 {
                     Post = posts,
@@ -146,12 +146,12 @@ namespace motel.Repositories
             }
             if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("newList", StringComparison.OrdinalIgnoreCase))
             {
-                var posts = isAscending ? 
+                var posts = isAscending ?
                     postlist.Where(p => p.dateCreated <= now && p.dateCreated >= oneDayAgo)
                         .OrderBy(x => x.dateCreated)
                         .Skip(skipResults)
                         .Take(pageSize)
-                        .ToList() : 
+                        .ToList() :
                     postlist.Where(p => p.dateCreated <= now && p.dateCreated >= oneDayAgo)
                         .OrderByDescending(x => x.dateCreated)
                         .Skip(skipResults)
@@ -193,37 +193,197 @@ namespace motel.Repositories
                 return result;
             }
         }
-        public PostListResult GetAllPostAdmin(int pageNumber = 1, int pageSize = 10)
+        public PostListResult GetAllPostAdmin(
+            string? hireState = null,
+            string? statusState = null,
+            decimal? minPrice = null, decimal? maxPrice = null,
+            int? minArea = null, int? maxArea = null,
+            int? category = null,
+            string? isVip = null,
+            string? phoneNumb = null,
+            string? address = null,
+            string? sortBy = null, bool isAscending = true,
+            int pageNumber = 1, int pageSize = 10)
         {
+            var postlist = _appDbContext.Post.Include(pm => pm.post_manage)
+                .Include(pm => pm.post_category)
+                .ThenInclude(pm => pm.category)
+                .Include(pm => pm.user)
+                .ThenInclude(pm => pm.users_tier)
+                .ThenInclude(pm => pm.tiers)
+                .Select(p => new PostDTO()
+                {
+                    Id = p.Id,
+                    title = p.title,
+                    address = p.address,
+                    authorname = p.user.firstname + " " + p.user.lastname,
+                    description = p.description,
+                    price = p.price,
+                    actualFile = CountImageFromString(p.actualFile),
+                    area = p.area,
+                    isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
+                    postTier = p.user.users_tier.tiers.tiername,
+                    status = p.status,
+                    authorid = p.userId,
+                    phone = p.user.phone,
+                    dateCreated = p.datecreatedroom,
+                    reason = p.post_manage.reason != null ? p.post_manage.reason.ToString() : "Không Bị Từ Chối Duyệt",
+                    FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
+                    FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
+                    categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
+                    categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
+                }).AsSplitQuery();
+            if (!string.IsNullOrWhiteSpace(hireState))
+            {
+                postlist = postlist.Where(x => x.isHire.Contains(hireState));
+            }
+            // Search theo trạng thái duyệt
+            if (!string.IsNullOrWhiteSpace(statusState))
+            {
+                postlist = postlist.Where(x => x.status.Contains(statusState));
+            }
+
+            // Search theo range price hoặc fixed price
+            if (minPrice.HasValue && maxPrice.HasValue)
+            {
+                postlist = postlist.Where(x => x.price >= minPrice && x.price <= maxPrice);
+            }
+            else if (minPrice.HasValue)
+            {
+                postlist = postlist.Where(x => x.price.Equals(minPrice));
+            }
+            else if (maxPrice.HasValue)
+            {
+                postlist = postlist.Where(x => x.price.Equals(maxPrice));
+            }
+
+            // Search theo area range hoặc fixed range
+            if (minArea.HasValue && maxArea.HasValue)
+            {
+                postlist = postlist.Where(x => x.area >= minArea && x.area <= maxArea);
+            }
+            else if (minArea.HasValue)
+            {
+                postlist = postlist.Where(x => x.area.Equals(minArea));
+            }
+            else if (maxArea.HasValue)
+            {
+                postlist = postlist.Where(x => x.area.Equals(maxArea));
+            }
+
+            // Search theo area range
+            if (category.HasValue)
+            {
+                postlist = postlist.Where(x => x.categoryids.Contains((int)category));
+            }
+
+            // Search theo sdt
+            if (!string.IsNullOrWhiteSpace(phoneNumb))
+            {
+                postlist = postlist.Where(x => x.phone.Contains(phoneNumb));
+            }
+
+            // Search theo address
+            if (!string.IsNullOrWhiteSpace(address))
+            {
+                postlist = postlist.Where(x => x.address.Contains(address));
+            }
+
+            //List theo tin vip hay thường
+            if (!string.IsNullOrWhiteSpace(isVip))
+            {
+                if (isVip.Equals("Hạng Thường", StringComparison.OrdinalIgnoreCase))
+                {
+                    postlist = postlist.Where(x => x.postTier.Equals("Hạng Thường"));
+                }
+                else if (isVip.Equals("Hạng Vip", StringComparison.OrdinalIgnoreCase))
+                {
+                    postlist = postlist.Where(x => x.postTier.Equals("Hạng Vip"));
+                }
+            }
+            if (postlist == null)
+            {
+                return null;
+            }
             var skipResults = (pageNumber - 1) * pageSize;
-            var postlist = _appDbContext.Post.Select(p => new PostDTO()
+            // Sort theo ngày tạo gần nhất
+            DateTime now = DateTime.Now;
+            DateTime oneDayAgo = now.AddDays(-30);
+            if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("dateCreated", StringComparison.OrdinalIgnoreCase))
             {
-                Id = p.Id,
-                title = p.title,
-                address = p.address,
-                authorname = p.user.firstname + " " + p.user.lastname,
-                description = p.description,
-                price = p.price,
-                actualFile = CountImageFromString(p.actualFile),
-                area = p.area,
-                isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
-                status = p.status,
-                authorid = p.userId,
-                FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
-                FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
-                categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
-                categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
-            }).AsQueryable();
-            var totalPost = postlist.Count();
-            var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
-            var posts = postlist.OrderBy(p => p.Id).Skip(skipResults).Take(pageSize).ToList();
-            var result = new PostListResult
+                var posts = isAscending ?
+                    postlist
+                    .OrderBy(x => x.dateCreated)
+                    .Skip(skipResults)
+                    .Take(pageSize)
+                    .ToList() :
+                    postlist
+                    .OrderByDescending(x => x.dateCreated)
+                    .Skip(skipResults)
+                    .Take(pageSize)
+                    .ToList();
+                if (posts == null || !posts.Any())
+                {
+                    return null;
+                }
+                var totalPost = postlist.Count();
+                var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
+                var result = new PostListResult
+                {
+                    Post = posts,
+                    total = totalPost,
+                    TotalPages = totalPages,
+                };
+                return result;
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("newList", StringComparison.OrdinalIgnoreCase))
             {
-                Post = posts,
-                total = totalPost,
-                TotalPages = totalPages,
-            };
-            return result;
+                var posts = isAscending ?
+                    postlist.Where(p => p.dateCreated <= now && p.dateCreated >= oneDayAgo)
+                        .OrderBy(x => x.dateCreated)
+                        .Skip(skipResults)
+                        .Take(pageSize)
+                        .ToList() :
+                    postlist.Where(p => p.dateCreated <= now && p.dateCreated >= oneDayAgo)
+                        .OrderByDescending(x => x.dateCreated)
+                        .Skip(skipResults)
+                        .Take(pageSize)
+                        .ToList();
+                if (posts == null || !posts.Any())
+                {
+                    return null;
+                }
+                var totalPost = posts.Count();
+                var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
+                var result = new PostListResult
+                {
+                    Post = posts,
+                    total = totalPost,
+                    TotalPages = totalPages,
+                };
+                return result;
+            }
+            else
+            {
+                var posts = postlist
+                    .OrderBy(p => p.Id)
+                    .Skip(skipResults)
+                    .Take(pageSize)
+                    .ToList();
+                if (posts == null || !posts.Any())
+                {
+                    return null;
+                }
+                var totalPost = postlist.Count();
+                var totalPages = (int)Math.Ceiling((double)totalPost / pageSize);
+                var result = new PostListResult
+                {
+                    Post = posts,
+                    total = totalPost,
+                    TotalPages = totalPages,
+                };
+                return result;
+            }
         }
         public PostNoIdDTO GetPostByID(int id)
         {
@@ -292,55 +452,50 @@ namespace motel.Repositories
             if (postDomain != null)
             {
                 var userDomain = _appDbContext.User.FirstOrDefault(ad => ad.Id == postDomain.userId);
-                if (userDomain.roleId == 1 || userDomain.roleId == 5)
+                if (updatepost.FileUri != null)
                 {
-                    if (updatepost.FileUri != null)
+                    if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
                     {
-                        if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
-                        {
-                            updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
-                            postDomain.actualFile = updatepost.actualFile;
-                            postDomain.FileUri = updatepost.FileUri;
-                        }
-                        else
-                        {
-                            updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
-                            postDomain.actualFile = updatepost.actualFile;
-                            postDomain.FileUri = updatepost.FileUri;
-                        }
+                        updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
+                        postDomain.actualFile = updatepost.actualFile;
+                        postDomain.FileUri = updatepost.FileUri;
                     }
                     else
                     {
-                        postDomain.actualFile = updatepost.actualFile = postDomain.actualFile;
+                        updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
+                        postDomain.actualFile = updatepost.actualFile;
+                        postDomain.FileUri = updatepost.FileUri;
                     }
-                    postDomain.title = updatepost.title;
-                    postDomain.description = updatepost.description;
-                    postDomain.address = updatepost.address;
-                    postDomain.price = updatepost.price;
-                    postDomain.status = updatepost.status;
-                    postDomain.isHire = (bool)updatepost.isHire;
-                    postDomain.area = updatepost.area;
-                    _appDbContext.SaveChanges();
-                    var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
-                    if (categoryrpostDomain != null)
-                    {
-                        _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
-                        _appDbContext.SaveChanges();
-                    }
-                    foreach (var categoryid in updatepost.categoryids)
-                    {
-                        var post_category = new Post_Category()
-                        {
-                            postId = id,
-                            categoryId = categoryid,
-                        };
-                        _appDbContext.Post_Category.Add(post_category);
-                        _appDbContext.SaveChanges();
-                    }
-                    return updatepost;
                 }
                 else
-                    return null;
+                {
+                    postDomain.actualFile = updatepost.actualFile = postDomain.actualFile;
+                }
+                postDomain.title = updatepost.title;
+                postDomain.description = updatepost.description;
+                postDomain.address = updatepost.address;
+                postDomain.price = updatepost.price;
+                postDomain.status = updatepost.status;
+                postDomain.isHire = (bool)updatepost.isHire;
+                postDomain.area = updatepost.area;
+                _appDbContext.SaveChanges();
+                var categoryrpostDomain = _appDbContext.Post_Category.Where(a => a.postId == id).ToList();
+                if (categoryrpostDomain != null)
+                {
+                    _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
+                    _appDbContext.SaveChanges();
+                }
+                foreach (var categoryid in updatepost.categoryids)
+                {
+                    var post_category = new Post_Category()
+                    {
+                        postId = id,
+                        categoryId = categoryid,
+                    };
+                    _appDbContext.Post_Category.Add(post_category);
+                    _appDbContext.SaveChanges();
+                }
+                return updatepost;
             }
             else
                 return null;
@@ -393,9 +548,21 @@ namespace motel.Repositories
             {
                 // Đang Chờ Duyệt,Không Chấp Nhận Duyệt, Đã Duyệt, Đã Ẩn
                 var postManage = _appDbContext.Post_Manage.FirstOrDefault(pm => pm.postId == id);
-                if (post_Approve.status.ToString() == "Từ Chối Được Duyệt")
+                if (postManage == null && postDomain != null)
+                {
+
+                    var postM = new Post_Manage
+                    {
+                        postId = postDomain.Id,
+                    };
+                    _appDbContext.Post_Manage.Add(postM);
+                    _appDbContext.SaveChanges();
+                }
+                if (post_Approve.status.ToString() == "Không Chấp Nhận Duyệt")
                 {
                     postManage.reason = post_Approve.reason;
+                    postManage.dateapproved = null;
+                    postManage.userAdminId = null;
                     postDomain.status = post_Approve.status;
                 }
                 if (post_Approve.status.ToString() == "Đã Duyệt")
@@ -403,10 +570,21 @@ namespace motel.Repositories
                     postManage.userAdminId = post_Approve.userAdminId;
                     postManage.dateapproved = post_Approve.dateApproved = DateTime.Now;
                     postDomain.status = post_Approve.status;
+                    postManage.reason = null;
                 }
                 if (post_Approve.status.ToString() == "Đã Ẩn")
                 {
                     postDomain.status = post_Approve.status;
+                    postManage.dateapproved = null;
+                    postManage.userAdminId = null;
+                    postManage.reason = post_Approve.reason;
+                }
+                if (post_Approve.status.ToString() == "Đang Chờ Duyệt")
+                {
+                    postDomain.status = post_Approve.status;
+                    postManage.dateapproved = null;
+                    postManage.userAdminId = null;
+                    postManage.reason = null;
                 }
                 _appDbContext.SaveChanges();
             }

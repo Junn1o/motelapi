@@ -21,6 +21,7 @@ namespace motel.Models.DTO
         public DateTime dateCreated { get; set; }
         public DateTime dateApproved { get; set; }
         public string phone { get; set; }
+        public string reason { get; set; }
         public string FormattedDatecreated { get; set; }
         public string FormattedDateapprove { get; set; }
         public List<string> categorylist { get; set; }
