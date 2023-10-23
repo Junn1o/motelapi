@@ -45,9 +45,26 @@ namespace motel.Controllers
                 return Ok("Data Empty");
         }
         [HttpGet("Get-all-post-admin")]
-        public IActionResult GetAllPostAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetAllPostAdmin([FromQuery] string? hireState,
+            [FromQuery] string? statusState,
+            [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice,
+            [FromQuery] int? minArea, [FromQuery] int? maxArea,
+            [FromQuery] int? category,
+            [FromQuery] string? isVip,
+            [FromQuery] string? phoneNumb,
+            [FromQuery] string? sortBy, [FromQuery] bool isAscending,
+            [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var postlist = _ipostRepository.GetAllPostAdmin(pageNumber, pageSize);
+            var postlist = _ipostRepository.GetAllPostAdmin(
+                            hireState,
+                            statusState,
+                            minPrice, maxPrice,
+                            minArea, maxArea,
+                            category,
+                            isVip,
+                            phoneNumb,
+                            sortBy, isAscending,
+                            pageNumber, pageSize);
             if (postlist != null)
             {
                 return Ok(postlist);
