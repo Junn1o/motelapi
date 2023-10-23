@@ -52,6 +52,7 @@ namespace motel.Controllers
             [FromQuery] int? category,
             [FromQuery] string? isVip,
             [FromQuery] string? phoneNumb,
+            [FromQuery] string? address,
             [FromQuery] string? sortBy, [FromQuery] bool isAscending,
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
@@ -63,6 +64,7 @@ namespace motel.Controllers
                             category,
                             isVip,
                             phoneNumb,
+                            address,
                             sortBy, isAscending,
                             pageNumber, pageSize);
             if (postlist != null)

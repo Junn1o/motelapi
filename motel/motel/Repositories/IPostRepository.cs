@@ -23,6 +23,7 @@ namespace motel.Repositories
             int? category = null,
             string? isVip = null,
             string? phoneNumb = null,
+            string? address = null,
             string? sortBy = null, bool isAscending = true,
             int pageNumber = 1, int pageSize = 10);
         PostNoIdDTO GetPostByID(int id);

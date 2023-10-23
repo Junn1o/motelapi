@@ -201,6 +201,7 @@ namespace motel.Repositories
             int? category = null,
             string? isVip = null,
             string? phoneNumb = null,
+            string? address = null,
             string? sortBy = null, bool isAscending = true,
             int pageNumber = 1, int pageSize = 10)
         {
@@ -212,23 +213,26 @@ namespace motel.Repositories
                 .ThenInclude(pm => pm.tiers)
                 .Select(p => new PostDTO()
                 {
-                Id = p.Id,
-                title = p.title,
-                address = p.address,
-                authorname = p.user.firstname + " " + p.user.lastname,
-                description = p.description,
-                price = p.price,
-                actualFile = CountImageFromString(p.actualFile),
-                area = p.area,
-                isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
-                status = p.status,
-                authorid = p.userId,
-                reason = p.post_manage.reason != null ? p.post_manage.reason.ToString() : "Không Bị Từ Chối Duyệt",
-                FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
-                FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
-                categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
-                categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
-            }).AsSplitQuery();
+                    Id = p.Id,
+                    title = p.title,
+                    address = p.address,
+                    authorname = p.user.firstname + " " + p.user.lastname,
+                    description = p.description,
+                    price = p.price,
+                    actualFile = CountImageFromString(p.actualFile),
+                    area = p.area,
+                    isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
+                    postTier = p.user.users_tier.tiers.tiername,
+                    status = p.status,
+                    authorid = p.userId,
+                    phone = p.user.phone,
+                    dateCreated = p.datecreatedroom,
+                    reason = p.post_manage.reason != null ? p.post_manage.reason.ToString() : "Không Bị Từ Chối Duyệt",
+                    FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
+                    FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
+                    categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
+                    categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
+                }).AsSplitQuery();
             if (!string.IsNullOrWhiteSpace(hireState))
             {
                 postlist = postlist.Where(x => x.isHire.Contains(hireState));
@@ -271,6 +275,18 @@ namespace motel.Repositories
             if (category.HasValue)
             {
                 postlist = postlist.Where(x => x.categoryids.Contains((int)category));
+            }
+
+            // Search theo sdt
+            if (!string.IsNullOrWhiteSpace(phoneNumb))
+            {
+                postlist = postlist.Where(x => x.phone.Contains(phoneNumb));
+            }
+
+            // Search theo address
+            if (!string.IsNullOrWhiteSpace(address))
+            {
+                postlist = postlist.Where(x => x.address.Contains(address));
             }
 
             //List theo tin vip hay thường
@@ -532,9 +548,9 @@ namespace motel.Repositories
             {
                 // Đang Chờ Duyệt,Không Chấp Nhận Duyệt, Đã Duyệt, Đã Ẩn
                 var postManage = _appDbContext.Post_Manage.FirstOrDefault(pm => pm.postId == id);
-                if ( postManage == null && postDomain != null)
+                if (postManage == null && postDomain != null)
                 {
-                    
+
                     var postM = new Post_Manage
                     {
                         postId = postDomain.Id,
