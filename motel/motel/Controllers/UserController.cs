@@ -83,6 +83,17 @@ namespace motel.Controllers
             else
                 return NotFound("Data Empty");
         }
+        [HttpPut("update-customer")]
+        public IActionResult UpdateUserBasic(int id, [FromForm] UpdateCustomer updateCustomer)
+        {
+            var user = _userRepositories.updateCustomer(id, updateCustomer);
+            if (user != null)
+            {
+                return Ok(user);
+            }
+            else
+                return NotFound("Data Empty");
+        }
         [HttpPut("update-role-user")]
         public IActionResult EditUserRole(EditUserRoleDTO updateRole)
         {
