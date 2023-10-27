@@ -28,8 +28,9 @@ namespace motel.Models.DTO
     }
     public class UserNoIdDTO
     {
-        public string fullname { get; set; }
-        public string gender { get; set; }
+        public string firstname { get; set; }
+        public string lastname { get; set; }
+        public bool gender { get; set; }
         public string address { get; set; }
         public string password { get; set; }
         public string phone { get; set; }
@@ -70,6 +71,16 @@ namespace motel.Models.DTO
         //public IFormFile? FileUri { set; get; }
         //public string? actualFile { get; set; }
 
+    }
+    public class UpdateCustomer
+    {
+        public string firstname { get; set; }
+        public string lastname { get; set; }
+        public string address { get; set; }
+        public bool gender { get; set; }
+        public string? birthday { get; set; }
+        public IFormFile? FileUri { set; get; }
+        public string? actualFile { get; set; }
     }
     public class UserListResult
     {

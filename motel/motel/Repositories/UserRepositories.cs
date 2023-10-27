@@ -196,8 +196,9 @@ filterQuery = null,int pageNumber = 1, int pageSize = 5)
             var UserbyDomain = _dbContext.User.Where(n => n.Id == id);
             var UserWithIdDTO = UserbyDomain.Select(User => new UserNoIdDTO()
             {
-                fullname = User.firstname + " " + User.lastname,
-                gender = User.gender ? "Nam" : "Nữ",
+                firstname = User.firstname,
+                lastname = User.lastname,
+                gender = User.gender,
                 address = User.address,
                 password = User.password,
                 phone = User.phone,
@@ -254,6 +255,50 @@ filterQuery = null,int pageNumber = 1, int pageSize = 5)
             }
 
             return updateUserBasic;
+        }
+        UpdateCustomer? IUserRepositories.updateCustomer(int id, motel.Models.DTO.UpdateCustomer updateCustomer)
+        {
+            var userDomain = _dbContext.User.FirstOrDefault(u => u.Id == id);
+            if (userDomain != null)
+            {
+                //if (updateCustomer.FileUri != null)
+                //{
+                //    updateCustomer.actualFile = UpdateImage(updateCustomer.FileUri, userDomain.actualFile, id, userDomain.datecreated.ToString("yyyy"));
+                //    userDomain.FileUri = updateCustomer.FileUri;
+                //    userDomain.actualFile = updateCustomer.actualFile;
+                //}
+                //if (updateCustomer.FileUri == null && userDomain.actualFile != null)
+                //{
+                //    updateCustomer.actualFile = userDomain.actualFile.ToString();
+                //    userDomain.actualFile = updateCustomer.actualFile;
+                //}
+                userDomain.firstname = updateCustomer.firstname;
+                userDomain.lastname = updateCustomer.lastname;
+                userDomain.address = updateCustomer.address;
+                userDomain.gender = updateCustomer.gender;
+                userDomain.birthday = DateTime.ParseExact(updateCustomer.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                //var tierDomain = _dbContext.Tier_User.FirstOrDefault(u => u.userId == id);
+                //if (updateUserBasic.tierId == 0 && tierDomain != null)
+                //{
+                //    updateUserBasic.tierId = tierDomain.tierId;
+                //}
+                //else
+                //{
+                //    tierDomain.tierId = updateUserBasic.tierId;
+                //}
+                //if (updateUserBasic.roleId == 0)
+                //{
+                //    updateUserBasic.roleId = userDomain.roleId;
+                //}
+                //else
+                //{
+                //    userDomain.roleId = updateUserBasic.roleId;
+                //}
+                _dbContext.SaveChanges();
+
+            }
+
+            return updateCustomer;
         }
         AddUserDTO? IUserRepositories.UpdateUserById(int id, AddUserDTO user)
         {

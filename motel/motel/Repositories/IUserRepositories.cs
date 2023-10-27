@@ -15,5 +15,6 @@ namespace motel.Repositories
         User? DeleteUserById(int id);
         User? Authenticate(string phone,string password);
         UpdateUserBasic UpdateUser(int id, UpdateUserBasic updateUserBasic);
+        UpdateCustomer updateCustomer(int id, UpdateCustomer updateCustomer);
     }
 }
