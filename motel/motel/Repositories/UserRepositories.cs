@@ -100,11 +100,11 @@ namespace motel.Repositories
         }
 
         UserListResult IUserRepositories.GetAllUser(string? filterOn = null, string?
-filterQuery = null,int pageNumber = 1, int pageSize = 5)
+filterQuery = null, int pageNumber = 1, int pageSize = 5)
         {
             var skipResults = (pageNumber - 1) * pageSize;
 
-            var query = _dbContext.User.Select(user => new UserDTO
+            var query = _dbContext.User.Include(ut => ut.users_tier).ThenInclude(ut => ut.tiers).Include(r => r.role).Select(user => new UserDTO
             {
                 Id = user.Id,
                 firstname = user.firstname,
@@ -121,33 +121,53 @@ filterQuery = null,int pageNumber = 1, int pageSize = 5)
                 posts = user.post.ToList(),
                 datecreated = user.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = user.actualFile,
-            }).AsQueryable();
+            }).AsSplitQuery();
             //filtering
-            if (string.IsNullOrWhiteSpace(filterOn) == false &&
-           string.IsNullOrWhiteSpace(filterQuery) == false)
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
             {
                 if (filterOn.Equals("firstname", StringComparison.OrdinalIgnoreCase))
                 {
-                    query = query.Where(x => x.firstname.Contains(filterQuery));
+                    var queryat = query.Where(x => x.firstname.Contains(filterQuery) || x.lastname.Contains(filterQuery));
                 }
+                if (filterOn.Equals("phone", StringComparison.OrdinalIgnoreCase))
+                {
+                    var queryat = query.Where(x => x.phone.Contains(filterQuery));
+                }
+                var users = query
+                            .OrderBy(u => u.Id)
+                            .Skip(skipResults)
+                            .Take(pageSize)
+                            .ToList();
+                var totalUsers = users.Count();
+                var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+                var result = new UserListResult
+                {
+                    Users = users,
+                    total = totalUsers,
+                    TotalPages = totalPages,
+                };
+
+                return result;
             }
-            var totalUsers = query.Count();
-            var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
-
-            var users = query
-                .OrderBy(u => u.Id)
-                .Skip(skipResults)
-                .Take(pageSize)
-                .ToList();
-
-            var result = new UserListResult
+            else
             {
-                Users = users,
-                total = totalUsers,
-                TotalPages = totalPages,
-            };
+                var totalUsers = query.Count();
+                var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+                var users = query
+                    .OrderBy(u => u.Id)
+                    .Skip(skipResults)
+                    .Take(pageSize)
+                    .ToList();
 
-            return result;
+                var result = new UserListResult
+                {
+                    Users = users,
+                    total = totalUsers,
+                    TotalPages = totalPages,
+                };
+
+                return result;
+            }
         }
         public UserRoleResult GetAllUserRole(int pageNumber = 1, int pageSize = 10)
         {
@@ -181,7 +201,7 @@ filterQuery = null,int pageNumber = 1, int pageSize = 5)
             foreach (int userIds in editroleDTO.userids)
             {
                 var UserDomain = _dbContext.User.FirstOrDefault(n => n.Id == userIds);
-                if (UserDomain!=null)
+                if (UserDomain != null)
                 {
                     UserDomain.roleId = editroleDTO.roleid;
                     _dbContext.SaveChanges();
@@ -234,7 +254,7 @@ filterQuery = null,int pageNumber = 1, int pageSize = 5)
                 userDomain.birthday = DateTime.ParseExact(updateUserBasic.birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 userDomain.phone = updateUserBasic.phone;
                 var tierDomain = _dbContext.Tier_User.FirstOrDefault(u => u.userId == id);
-                if (updateUserBasic.tierId == 0 && tierDomain!=null)
+                if (updateUserBasic.tierId == 0 && tierDomain != null)
                 {
                     updateUserBasic.tierId = tierDomain.tierId;
                 }
@@ -384,7 +404,7 @@ filterQuery = null,int pageNumber = 1, int pageSize = 5)
             }
         }
 
-       
+
 
     }
 }
