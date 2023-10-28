@@ -39,7 +39,7 @@ namespace motel.Models.DTO
         public string birthday { get; set; }
         public string datecreated { get; set; }
         //public List<string> post_manages { get; set; }
-        public List<Post> posts { get; set; }
+        public List<PostDTO> posts { get; set; }
     }
     public class AddUserDTO
     {

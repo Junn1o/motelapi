@@ -97,6 +97,12 @@ namespace motel.Controllers
             var postUpdate = _ipostRepository.UpdatePost(id, updatepost);
             return Ok(postUpdate);
         }
+        [HttpPut("delete-image")]
+        public IActionResult deleteImg(int id,[FromBody] DeleteImg deleteImg)
+        {
+            var imageDelete = _ipostRepository.deleteImg(id, deleteImg);
+            return Ok(imageDelete);
+        }
         [HttpPut("update-basic")]
         public IActionResult UpdatePostM(int id ,[FromBody] UpdatePostManage updatePostBasic)
         {

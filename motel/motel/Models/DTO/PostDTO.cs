@@ -22,6 +22,7 @@ namespace motel.Models.DTO
         public DateTime dateApproved { get; set; }
         public string phone { get; set; }
         public string reason { get; set; }
+        public string expireDate { get; set; }
         public string FormattedDatecreated { get; set; }
         public string FormattedDateapprove { get; set; }
         public List<string> categorylist { get; set; }
@@ -81,5 +82,9 @@ namespace motel.Models.DTO
         public string status { get; set; }
         public string? reason { get; set; }
         public DateTime? dateApproved { get; set; }
+    }
+    public class DeleteImg
+    {
+        public string actualFile { get; set; }
     }
 }
