@@ -421,9 +421,9 @@ namespace motel.Repositories
                 status = addpost.status = "Đang Chờ Duyệt",
                 isHire = (bool)(addpost.isHire = false),
                 area = addpost.area,
-                datecreatedroom = (DateTime)(addpost.dateCreated = DateTime.Now),
+                datecreatedroom  = (DateTime)(addpost.dateCreated = DateTime.Now),
             };
-            _appDbContext.Add(postDomain);
+            _appDbContext.Post.Add(postDomain);
             _appDbContext.SaveChanges();
             if (addpost.FileUri != null)
             {
