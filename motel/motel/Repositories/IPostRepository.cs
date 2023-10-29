@@ -32,5 +32,6 @@ namespace motel.Repositories
         Post DeletePost(int id);
         UpdatePostManage UpdatePostM(int id, UpdatePostManage updatepost);
         Post_Approve post_Approve(int id, Post_Approve post_Approve);
+        DeleteImg deleteImg(int id, DeleteImg deleteImg);
     }
 }

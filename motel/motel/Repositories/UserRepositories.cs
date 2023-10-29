@@ -212,7 +212,38 @@ filterQuery = null, int pageNumber = 1, int pageSize = 5)
 
         UserNoIdDTO IUserRepositories.GetUserById(int id)
         {
-
+            DateTime now = DateTime.Now;
+            DateTime oneDayAgo = now.AddDays(-30);
+            var postlist = _dbContext.Post.
+                Include(pm => pm.post_manage)
+                .Include(pm => pm.post_category)
+                .ThenInclude(pm => pm.category)
+                .Include(pm => pm.user)
+                .ThenInclude(pm => pm.users_tier)
+                .ThenInclude(pm => pm.tiers).Where(n => n.userId == id)
+                .Select(p => new PostDTO()
+                {
+                    Id = p.Id,
+                    title = p.title,
+                    address = p.address,
+                    authorname = p.user.firstname + " " + p.user.lastname,
+                    description = p.description,
+                    price = p.price,
+                    actualFile = p.actualFile,
+                    area = p.area,
+                    isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
+                    postTier = p.user.users_tier.tiers.tiername,
+                    status = p.status,
+                    authorid = p.userId,
+                    phone = p.user.phone,
+                    dateCreated = p.datecreatedroom,
+                    expireDate = p.datecreatedroom.AddDays(30).ToString("dd/MM/yyyy"),
+                    reason = p.post_manage.reason != null ? p.post_manage.reason.ToString() : "Không Bị Từ Chối Duyệt",
+                    FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
+                    FormattedDateapprove = p.post_manage.dateapproved != null ? p.post_manage.dateapproved.Value.ToString("dd/MM/yyyy") : "Chưa Có Ngày Duyệt",
+                    categorylist = p.post_category.Select(pc => pc.category.name).ToList(),
+                    categoryids = p.post_category.Select(pc => pc.category.Id).ToList(),
+                }).AsSplitQuery();
             var UserbyDomain = _dbContext.User.Where(n => n.Id == id);
             var UserWithIdDTO = UserbyDomain.Select(User => new UserNoIdDTO()
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using motel.Data;
 using motel.Models.Domain;
 using motel.Models.DTO;
@@ -22,6 +23,8 @@ namespace motel.Repositories
             string? sortBy = null, bool isAscending = true,
             int pageNumber = 1, int pageSize = 10)
         {
+            DateTime now = DateTime.Now;
+            DateTime oneDayAgo = now.AddDays(-30);
             var postlist = _appDbContext.Post
                 .Include(pm => pm.post_manage)
                 .Include(pm => pm.post_category)
@@ -42,6 +45,7 @@ namespace motel.Repositories
                     isHire = p.isHire ? "Đã Được Thuê" : "Chưa Được Thuê",
                     status = p.status,
                     authorid = p.userId,
+                    expireDate = p.datecreatedroom.AddDays(30).ToString("dd/MM/yyyy"),
                     dateCreated = p.datecreatedroom,
                     dateApproved = p.post_manage.dateapproved.HasValue ? p.post_manage.dateapproved.Value : new DateTime(2020, 10, 22),
                     FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
@@ -115,8 +119,6 @@ namespace motel.Repositories
             }
             var skipResults = (pageNumber - 1) * pageSize;
             // Sort theo ngày tạo gần nhất
-            DateTime now = DateTime.Now;
-            DateTime oneDayAgo = now.AddDays(-30);
             if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("dateCreated", StringComparison.OrdinalIgnoreCase))
             {
                 var posts = isAscending ?
@@ -205,6 +207,8 @@ namespace motel.Repositories
             string? sortBy = null, bool isAscending = true,
             int pageNumber = 1, int pageSize = 10)
         {
+            DateTime now = DateTime.Now;
+            DateTime oneDayAgo = now.AddDays(-30);
             var postlist = _appDbContext.Post.Include(pm => pm.post_manage)
                 .Include(pm => pm.post_category)
                 .ThenInclude(pm => pm.category)
@@ -226,6 +230,7 @@ namespace motel.Repositories
                     status = p.status,
                     authorid = p.userId,
                     phone = p.user.phone,
+                    expireDate = p.datecreatedroom.AddDays(30).ToString("dd/MM/yyyy"),
                     dateCreated = p.datecreatedroom,
                     reason = p.post_manage.reason != null ? p.post_manage.reason.ToString() : "Không Bị Từ Chối Duyệt",
                     FormattedDatecreated = p.datecreatedroom.ToString("dd/MM/yyyy"),
@@ -307,8 +312,6 @@ namespace motel.Repositories
             }
             var skipResults = (pageNumber - 1) * pageSize;
             // Sort theo ngày tạo gần nhất
-            DateTime now = DateTime.Now;
-            DateTime oneDayAgo = now.AddDays(-30);
             if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("dateCreated", StringComparison.OrdinalIgnoreCase))
             {
                 var posts = isAscending ?
@@ -452,24 +455,33 @@ namespace motel.Repositories
             if (postDomain != null)
             {
                 var userDomain = _appDbContext.User.FirstOrDefault(ad => ad.Id == postDomain.userId);
+                if (CheckFileExists(postDomain.actualFile) != null)
+                {
+                    postDomain.actualFile = CheckFileExists(postDomain.actualFile);
+                }
                 if (updatepost.FileUri != null)
                 {
-                    if (postDomain.actualFile == null || AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri) == null)
+                    if (postDomain.actualFile == null || postDomain.actualFile == "")
                     {
                         updatepost.actualFile = UploadImage(updatepost.FileUri, userDomain.Id, userDomain.datecreated.ToString("yyyy"), postDomain.Id);
-                        postDomain.actualFile = updatepost.actualFile;
                         postDomain.FileUri = updatepost.FileUri;
+                        postDomain.actualFile = updatepost.actualFile;
                     }
                     else
                     {
                         updatepost.actualFile = AddNewImagesToPath(postDomain.actualFile, updatepost.FileUri);
-                        postDomain.actualFile = updatepost.actualFile;
                         postDomain.FileUri = updatepost.FileUri;
+                        postDomain.actualFile = updatepost.actualFile;
                     }
                 }
                 else
                 {
-                    postDomain.actualFile = updatepost.actualFile = postDomain.actualFile;
+                    updatepost.actualFile = postDomain.actualFile;
+                }
+                if(updatepost.status != "Đã Duyệt")
+                {
+                    if (updatepost.isHire != true)
+                        postDomain.datecreatedroom = DateTime.Now;
                 }
                 postDomain.title = updatepost.title;
                 postDomain.description = updatepost.description;
@@ -484,16 +496,16 @@ namespace motel.Repositories
                 {
                     _appDbContext.Post_Category.RemoveRange(categoryrpostDomain);
                     _appDbContext.SaveChanges();
-                }
-                foreach (var categoryid in updatepost.categoryids)
-                {
-                    var post_category = new Post_Category()
+                    foreach (var categoryid in updatepost.categoryids)
                     {
-                        postId = id,
-                        categoryId = categoryid,
-                    };
-                    _appDbContext.Post_Category.Add(post_category);
-                    _appDbContext.SaveChanges();
+                        var post_category = new Post_Category()
+                        {
+                            postId = id,
+                            categoryId = categoryid,
+                        };
+                        _appDbContext.Post_Category.Add(post_category);
+                        _appDbContext.SaveChanges();
+                    }
                 }
                 return updatepost;
             }
@@ -616,8 +628,60 @@ namespace motel.Repositories
             }
             return postDomain;
         }
+        public DeleteImg deleteImg(int id, DeleteImg deleteImg)
+        {
+            var postDomain = _appDbContext.Post.FirstOrDefault(r => r.Id == id);
+            if (postDomain != null)
+            {
+                string[] filePaths = deleteImg.actualFile.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                string existingImages = "";
+                if (deleteImg.actualFile != null)
+                {
+                    foreach (string image in filePaths)
+                    {
+                        string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", image);
+                        if (File.Exists(folderPath))
+                        {
+                            File.Delete(folderPath);
+                            postDomain.actualFile = postDomain.actualFile.Replace(image + ";", string.Empty);
+                        }
+                        else
+                        {
+                            postDomain.actualFile = postDomain.actualFile.Replace(image + ";", string.Empty);
+                        }
+                    }
+                    if (postDomain.actualFile.EndsWith(";"))
+                    {
+                        postDomain.actualFile = postDomain.actualFile.TrimEnd(';');
+                    }
+                }
+                _appDbContext.SaveChanges();
+            }
+            return null;
+        }
+        public string AddNewImagesToPath(string imagePath, IFormFile[] newFiles)
+        {
+            string picture = imagePath;
+            string[] existingImagePaths = imagePath.Split(';');
+            string[] parts = existingImagePaths[0].Split('\\');
+            string idAndDate = parts[2];
+            string roomid = parts[4];
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "user", idAndDate, "uploads", roomid.ToString());
+            int startingCount = existingImagePaths.Length;
+            foreach (var image in newFiles)
+            {
+                string fileName = roomid + "-image_" + (startingCount++) + Path.GetExtension(image.FileName);
 
-
+                var filePath = Path.Combine(folderPath, fileName);
+                using (FileStream ms = new FileStream(filePath, FileMode.Create))
+                {
+                    image.CopyTo(ms);
+                }
+                string relativePath = Path.Combine("images", "user", idAndDate, "uploads", roomid.ToString(), fileName);
+                picture += relativePath + ";";
+            }
+            return picture;
+        }
 
 
         public string UploadImage(IFormFile[] file, int id, string adatecreated, int roomid)
@@ -640,37 +704,26 @@ namespace motel.Repositories
             }
             return picture;
         }
-        public string AddNewImagesToPath(string imagePath, IFormFile[] newFiles)
+        public string CheckFileExists(string imagePath)
         {
-            string picture = imagePath;
-            string[] existingImagePaths = imagePath.Split(';');
-            string[] parts = existingImagePaths[0].Split('\\');
-            string idAndDate = parts[2];
-            string roomid = parts[4];
-            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "user", idAndDate, "uploads", roomid);
-            if (!File.Exists(existingImagePaths[0]))
+            string existingImages = "";
+            if (imagePath != null)
             {
-                return null;
+                string[] filePaths = imagePath.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string image in filePaths)
+                {
+                    string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", image);
+                    if (File.Exists(folderPath))
+                    {
+                        existingImages += image + ";";
+                    }
+                }
+                return existingImages; // file  exist
             }
             else
-            {
-                int startingCount = existingImagePaths.Length;
-
-                foreach (var image in newFiles)
-                {
-                    string fileName = roomid + "-image_" + (startingCount++) + Path.GetExtension(image.FileName);
-
-                    var filePath = Path.Combine(folderPath, fileName);
-                    using (FileStream ms = new FileStream(filePath, FileMode.Create))
-                    {
-                        image.CopyTo(ms);
-                    }
-                    string relativePath = Path.Combine("images", "user", idAndDate, "uploads", fileName + Path.GetExtension(image.FileName));
-                    picture += relativePath + ";";
-                }
-                return picture;
-            }
+                return null; // file not exist
         }
+
         public bool DeleteRoomImages(string imagePath)
         {
             string[] imagePaths = imagePath.Split(';');
@@ -685,6 +738,7 @@ namespace motel.Repositories
                 return false;
             }
         }
+        
         private static string GetImageFromString(string actualFile)
         {
             if (actualFile == null)
