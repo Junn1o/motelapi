@@ -255,7 +255,7 @@ filterQuery = null, int pageNumber = 1, int pageSize = 5)
                 phone = User.phone,
                 tier = User.users_tier.tiers.tiername,
                 rolename = User.role.rolename,
-                posts = User.post.ToList(),
+                posts = postlist.ToList(),
                 birthday = User.birthday.ToString("dd/MM/yyyy"),
                 datecreated = User.datecreated.ToString("dd/MM/yyyy"),
                 actualFile = User.actualFile,
