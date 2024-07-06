@@ -39,7 +39,6 @@ namespace motel.Data
         public DbSet<Post> Post { get; set; }
         public DbSet<Tiers> Tiers { get; set; }
         public DbSet<Role> Role { get; set; }
-
     }
 }
 
