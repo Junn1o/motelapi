@@ -44,7 +44,8 @@ _ReSharper*/
 
 # TeamCity is a build add-in
 _TeamCity*
-
+.env
+/secrets
 # User-specific files
 *.rsuser
 *.suo
@@ -389,3 +390,4 @@ FodyWeavers.xsd
 /motel/motel/obj/project.nuget.cache
 /motel/motel/motel.csproj.user
 /motel/motel/motel.csproj
+/motel/motel/obj/*

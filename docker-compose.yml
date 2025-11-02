@@ -1,0 +1,31 @@
+services: 
+  motelapi:
+    build: .
+    user: "0:0"
+    ports:
+    - "9023:9023"
+    - "9024:9024"
+    environment:
+      ASPNETCORE_URLS: "https://+:9024;http://+:9023"
+      ASPNETCORE_HTTPS_PORT: "9024"
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${ASPNETCORE_Kestrel__Certificates__Default__Password}
+      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
+      Jwt__Key: ${Jwt__Key}
+      Jwt__Issuer: ${Jwt__Issuer}
+      Jwt__Audience: ${Jwt__Audience}
+    volumes:
+      - ./secrets/UserSecrets/:/root/.microsoft/usersecrets
+      - ./secrets/https:/https/
+      - ./upload/:/app/wwwroot/images
+    restart: always
+
+    networks:
+      - motel-network
+networks:
+  motel-network:
+    external: true
+volumes:
+  uploads:
+    driver: local
