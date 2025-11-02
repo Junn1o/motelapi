@@ -44,7 +44,8 @@ _ReSharper*/
 
 # TeamCity is a build add-in
 _TeamCity*
-
+.env
+/secrets
 # User-specific files
 *.rsuser
 *.suo
