@@ -1,0 +1,19 @@
+services: 
+  motelapi:
+    build: .
+    ports:
+    - "8000:80"
+    - "8001:443"
+    environment:
+      ASPNETCORE_URLS: "https://+;http://+"
+      ASPNETCORE_HTTPS_PORT: "8001"
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "1234123"
+      ConnectionStrings__DefaultConnection: Data Source=sqlserver;Persist Security Info=True;Database=motel;User ID=sa;Password=wOV!6IRki9*uEX;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;
+      Jwt__Key: A4E6E134CF8CD6805BCF2473A767AE0467C42331025696C35774E64B9A6EF8E8A4E6E134CF8CD6805BCF2473A767AE0467C42331025696C35774E64B9A6EF8E8
+      Jwt__Issuer: https://motelapi.example.com
+      Jwt__Audience: https://motelapi.example.com
+    volumes:
+      - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
+      - ${USERPROFILE}\.aspnet\https:/https/
